@@ -272,7 +272,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/08/13/hello-world/" itemprop="url">Hello World</a></h1>
+                <a class="post-title-link" href="/2017/08/13/hello-world/" itemprop="url">Is this useful?</a></h1>
         
 
         <div class="post-meta">
@@ -368,6 +368,169 @@
 
 
     
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/08/11/ReactiveCocoa学习笔记（一）：ReactiveCocoa的前世今生/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/08/11/ReactiveCocoa学习笔记（一）：ReactiveCocoa的前世今生/" itemprop="url">ReactiveCocoa学习笔记（一）：ReactiveCocoa的前世今生</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Veröffentlicht am</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-08-11T21:37:54+08:00">
+                2017-08-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">in</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/blog/" itemprop="url" rel="index">
+                    <span itemprop="name">blog</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <blockquote>
+<p>最近很长一段时间在研究ReactiveCocoa这个库，因此将会写一系列的文章来记录和总结一下学习过程中的心得体会。本文是这个系列的第一篇，主要介绍了ReactiveCocoa的诞生和发展。</p>
+</blockquote>
+<p>就像公司招聘员工工作之前，都要从简历来了解员工前面的学习、工作经历一样。我们在深入了解ReactiveCocoa这个强有力的工具之前，也有必要来了解一下它的前世今生，这也有助于更好理解它的核心思想和工作方式。</p>
+<h3 id="从Reactive-Extensions说起"><a href="#从Reactive-Extensions说起" class="headerlink" title="从Reactive Extensions说起"></a>从Reactive Extensions说起</h3><p>C#3.0中引入了Language Integrated Query（LINQ）这种语言特性。LINQ是对.NET的一个扩展，提供了统一的语法来从不同数据源中查询和提取数据。它的函数性和声明式语法使得我们的处理逻辑变得简单清晰。</p>
+<p>Reactive Extension（Rx）是对LINQ的一种扩展，起源于Microsoft DevLabs的研究。它主要提供了一种组织和协调异步事件的方式。如果说LINQ专注的是处理静态集合数据，那么Rx处理的就是异步获得的集合数据。LINQ面对的是“现在”的数据，则Rx是定义了如何去处理“未来”的数据（例如将从服务器返回的数据）的方式。</p>
+<p>Rx的核心思想是两点：集成式的异步编程和事件驱动的编程。</p>
+<ul>
+<li>集成式的异步编程（composing asynchronous）：Rx将各种异步的逻辑统一集成到同一处代码，而不是分散在代码各处进行处理。这样使得代码逻辑更加集中和清晰。</li>
+<li>基于事件（event-based）：Rx处理的是（未来的）数据/事件的集合，并提供了一系列的操作工具来声明式地处理这些集合。</li>
+</ul>
+<p>Rx使用一种可观察集合（Observable Sequence）来实现上述功能。可观察集合是Rx的核心，它是代表未来的值/事件的一个集合。我们声明了异步处理这些值的方式，这样当未来的值被添加到集合中的时候，我们便能够观察到（接收到）这些值并进行处理。</p>
+<h3 id="RxSwift和ReactiveCocoa"><a href="#RxSwift和ReactiveCocoa" class="headerlink" title="RxSwift和ReactiveCocoa"></a>RxSwift和ReactiveCocoa</h3><p>Rx是一个很大的家族，号称“ReactiveX is everywhere, and it’s meant for everything”。各大主流编程语言中都有它的身影，比如Java的RxJava，JavaScript的RxJS，C++的RxCpp等。从前端到后端，Rx家族都有很大的舞台。对于移动端来说，也有这么一个大家族的成员——Swift的<a href="https://github.com/ReactiveX/RxSwift" target="_blank" rel="external">RxSwift</a>。</p>
+<p>是的，RxSwift才是Rx家族的正统血统。而<a href="https://github.com/ReactiveCocoa/ReactiveCocoa" target="_blank" rel="external">ReactiveCocoa</a>则是一个Cocoa的扩展框架，它是<a href="https://github.com/jspahrsummers" title="Justin Spahr-Summers" target="_blank" rel="external">Justin Spahr-Summers</a>和<a href="https://github.com/joshaber" target="_blank" rel="external">Josh Abernathy</a>在开发<a href="https://desktop.github.com/" target="_blank" rel="external">GitHub for Mac</a>的过程中的副产物。ReactiveCocoa受<code>Functional Reactive Programming(FRP)</code>的启发，但是最近他们提到也受到过Rx的启发。因此，可以说ReactiveCocoa是借鉴了一些RxSwift的精神的，源自于FRP的一个框架。</p>
+<p>可以说，RxSwift和ReactiveCocoa是很神似的，它们都是函数式的、响应式的框架（但都不是真正意义上的<code>函数响应式</code>，后续文章会讲到）。但是又有一些不同点：</p>
+<ul>
+<li>ReactiveCocoa是一个有4年历史的框架，经历了很多大型项目的实践运用</li>
+<li>RxSwift时间短一点。但是社区非常有活力。此外，由于RxSwift是Rx的正统家族成员，因此，在RxSwift、RxJava、RxJs等框架间迁移十分方便。<br>此外，两者还有一些技术实现上的差别，这里先不做深入研究。</li>
+</ul>
+<p>ReactiveCocoa的<code>2.5.0</code>版本及以下为Objective-C版本，<code>3.0.0</code>版本以上到最新的发布版本<code>6.0.0</code>为Swift版本，现在支持到Swift <code>3.0.x</code>。因此，如果使用Objective-C的话，ReactiveCocoa v2.5.0（现在改名叫<a href="https://github.com/ReactiveCocoa/ReactiveObjC" target="_blank" rel="external">ReactiveObjC</a>了）是你的选择。如果使用的是Swift的话，那么使用最新的ReactiveCocoa版本就OK。</p>
+<hr>
+<h3 id="相关链接"><a href="#相关链接" class="headerlink" title="相关链接"></a>相关链接</h3><p><a href="http://reactivex.io/" target="_blank" rel="external">http://reactivex.io/</a><br><a href="https://stackoverflow.com/questions/32542846/reactivecocoa-vs-rxswift-pros-and-cons" target="_blank" rel="external">https://stackoverflow.com/questions/32542846/reactivecocoa-vs-rxswift-pros-and-cons</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
   </section>
 
   
@@ -414,12 +577,21 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-count">2</span>
                 <span class="site-state-item-name">Artikel</span>
               </a>
             </div>
           
 
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">Kategorien</span>
+              
+            </div>
           
 
           
