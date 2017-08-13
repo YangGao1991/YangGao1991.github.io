@@ -5,7 +5,7 @@
   
 
 
-<html class="theme-next muse use-motion" lang="">
+<html class="theme-next muse use-motion" lang="zh-Hans">
 <head>
   <meta charset="UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -94,16 +94,17 @@
 
 
 
-<meta name="description" content="最近很长一段时间在研究ReactiveCocoa这个库，因此将会写一系列的文章来记录和总结一下学习过程中的心得体会。本文是这个系列的第一篇，主要介绍了ReactiveCocoa的诞生和发展。  就像公司招聘员工工作之前，都要从简历来了解员工前面的学习、工作经历一样。我们在深入了解ReactiveCocoa这个强有力的工具之前，也有必要来了解一下它的前世今生，这也有助于更好理解它的核心思想和工作方">
+<meta name="description" content="最近很长一段时间在研究ReactiveCocoa这个框架，因此将会写一系列的文章来记录和总结一下学习过程中的心得体会。本文是这个系列的第一篇，主要介绍了ReactiveCocoa的诞生和发展。  就像公司招聘员工工作之前，都要从简历来了解员工前面的学习、工作经历一样。我们在深入了解ReactiveCocoa这个强有力的工具之前，也有必要来了解一下它的前世今生，这也有助于更好理解它的核心思想和工作">
 <meta property="og:type" content="article">
 <meta property="og:title" content="ReactiveCocoa学习笔记（一）：ReactiveCocoa的前世今生">
 <meta property="og:url" content="http://yoursite.com/2017/08/11/ReactiveCocoa学习笔记（一）：ReactiveCocoa的前世今生/index.html">
 <meta property="og:site_name" content="Sheep&#39;s Blog">
-<meta property="og:description" content="最近很长一段时间在研究ReactiveCocoa这个库，因此将会写一系列的文章来记录和总结一下学习过程中的心得体会。本文是这个系列的第一篇，主要介绍了ReactiveCocoa的诞生和发展。  就像公司招聘员工工作之前，都要从简历来了解员工前面的学习、工作经历一样。我们在深入了解ReactiveCocoa这个强有力的工具之前，也有必要来了解一下它的前世今生，这也有助于更好理解它的核心思想和工作方">
-<meta property="og:updated_time" content="2017-08-12T07:15:47.000Z">
+<meta property="og:description" content="最近很长一段时间在研究ReactiveCocoa这个框架，因此将会写一系列的文章来记录和总结一下学习过程中的心得体会。本文是这个系列的第一篇，主要介绍了ReactiveCocoa的诞生和发展。  就像公司招聘员工工作之前，都要从简历来了解员工前面的学习、工作经历一样。我们在深入了解ReactiveCocoa这个强有力的工具之前，也有必要来了解一下它的前世今生，这也有助于更好理解它的核心思想和工作">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2017-08-13T15:46:24.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ReactiveCocoa学习笔记（一）：ReactiveCocoa的前世今生">
-<meta name="twitter:description" content="最近很长一段时间在研究ReactiveCocoa这个库，因此将会写一系列的文章来记录和总结一下学习过程中的心得体会。本文是这个系列的第一篇，主要介绍了ReactiveCocoa的诞生和发展。  就像公司招聘员工工作之前，都要从简历来了解员工前面的学习、工作经历一样。我们在深入了解ReactiveCocoa这个强有力的工具之前，也有必要来了解一下它的前世今生，这也有助于更好理解它的核心思想和工作方">
+<meta name="twitter:description" content="最近很长一段时间在研究ReactiveCocoa这个框架，因此将会写一系列的文章来记录和总结一下学习过程中的心得体会。本文是这个系列的第一篇，主要介绍了ReactiveCocoa的诞生和发展。  就像公司招聘员工工作之前，都要从简历来了解员工前面的学习、工作经历一样。我们在深入了解ReactiveCocoa这个强有力的工具之前，也有必要来了解一下它的前世今生，这也有助于更好理解它的核心思想和工作">
 
 
 
@@ -118,7 +119,7 @@
     motion: true,
     duoshuo: {
       userId: '0',
-      author: 'Author'
+      author: '博主'
     },
     algolia: {
       applicationID: '',
@@ -150,7 +151,7 @@
 
 </head>
 
-<body itemscope itemtype="http://schema.org/WebPage" lang="">
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
   
   
@@ -198,7 +199,7 @@
             
               <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
             
-            Home
+            首页
           </a>
         </li>
       
@@ -208,7 +209,7 @@
             
               <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
             
-            Archives
+            归档
           </a>
         </li>
       
@@ -218,7 +219,7 @@
             
               <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
             
-            Tags
+            标签
           </a>
         </li>
       
@@ -260,7 +261,7 @@
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Sheep">
       <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/avatar.jpg">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -282,9 +283,9 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               
-                <span class="post-meta-item-text">Posted on</span>
+                <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-08-11T21:37:54+08:00">
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-11T21:37:54+08:00">
                 2017-08-11
               </time>
             
@@ -303,7 +304,7 @@
                 <i class="fa fa-folder-o"></i>
               </span>
               
-                <span class="post-meta-item-text">In</span>
+                <span class="post-meta-item-text">分类于</span>
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
@@ -345,7 +346,7 @@
 
       
         <blockquote>
-<p>最近很长一段时间在研究ReactiveCocoa这个库，因此将会写一系列的文章来记录和总结一下学习过程中的心得体会。本文是这个系列的第一篇，主要介绍了ReactiveCocoa的诞生和发展。</p>
+<p>最近很长一段时间在研究ReactiveCocoa这个框架，因此将会写一系列的文章来记录和总结一下学习过程中的心得体会。本文是这个系列的第一篇，主要介绍了ReactiveCocoa的诞生和发展。</p>
 </blockquote>
 <p>就像公司招聘员工工作之前，都要从简历来了解员工前面的学习、工作经历一样。我们在深入了解ReactiveCocoa这个强有力的工具之前，也有必要来了解一下它的前世今生，这也有助于更好理解它的核心思想和工作方式。</p>
 <h3 id="从Reactive-Extensions说起"><a href="#从Reactive-Extensions说起" class="headerlink" title="从Reactive Extensions说起"></a>从Reactive Extensions说起</h3><p>C#3.0中引入了Language Integrated Query（LINQ）这种语言特性。LINQ是对.NET的一个扩展，提供了统一的语法来从不同数据源中查询和提取数据。它的函数性和声明式语法使得我们的处理逻辑变得简单清晰。</p>
@@ -356,16 +357,35 @@
 <li>基于事件（event-based）：Rx处理的是（未来的）数据/事件的集合，并提供了一系列的操作工具来声明式地处理这些集合。</li>
 </ul>
 <p>Rx使用一种可观察集合（Observable Sequence）来实现上述功能。可观察集合是Rx的核心，它是代表未来的值/事件的一个集合。我们声明了异步处理这些值的方式，这样当未来的值被添加到集合中的时候，我们便能够观察到（接收到）这些值并进行处理。</p>
-<h3 id="RxSwift和ReactiveCocoa"><a href="#RxSwift和ReactiveCocoa" class="headerlink" title="RxSwift和ReactiveCocoa"></a>RxSwift和ReactiveCocoa</h3><p>Rx是一个很大的家族，号称“ReactiveX is everywhere, and it’s meant for everything”。各大主流编程语言中都有它的身影，比如Java的RxJava，JavaScript的RxJS，C++的RxCpp等。从前端到后端，Rx家族都有很大的舞台。对于移动端来说，也有这么一个大家族的成员——Swift的<a href="https://github.com/ReactiveX/RxSwift" target="_blank" rel="external">RxSwift</a>。</p>
-<p>是的，RxSwift才是Rx家族的正统血统。而<a href="https://github.com/ReactiveCocoa/ReactiveCocoa" target="_blank" rel="external">ReactiveCocoa</a>则是一个Cocoa的扩展框架，它是<a href="https://github.com/jspahrsummers" title="Justin Spahr-Summers" target="_blank" rel="external">Justin Spahr-Summers</a>和<a href="https://github.com/joshaber" target="_blank" rel="external">Josh Abernathy</a>在开发<a href="https://desktop.github.com/" target="_blank" rel="external">GitHub for Mac</a>的过程中的副产物。ReactiveCocoa受<code>Functional Reactive Programming(FRP)</code>的启发，但是最近他们提到也受到过Rx的启发。因此，可以说ReactiveCocoa是借鉴了一些RxSwift的精神的，源自于FRP的一个框架。</p>
+<h3 id="RxSwift和ReactiveCocoa"><a href="#RxSwift和ReactiveCocoa" class="headerlink" title="RxSwift和ReactiveCocoa"></a>RxSwift和ReactiveCocoa</h3><p>Rx是一个很大的家族，号称「ReactiveX is everywhere, and it’s meant for everything」。各大主流编程语言中都有它的身影，比如Java的RxJava，JavaScript的RxJS，C++的RxCpp等。从前端到后端，Rx家族都有很大的舞台。对于移动端来说，也有这么一个大家族的成员——Swift的<a href="https://github.com/ReactiveX/RxSwift" target="_blank" rel="external">RxSwift</a>。</p>
+<p>是的，RxSwift才是Rx家族的正统血统。那么，我们的主角ReactiveCocoa和它有什么关系呢？</p>
+<p>并没有什么关系（手动滑稽）。</p>
+<p><a href="https://github.com/ReactiveCocoa/ReactiveCocoa" target="_blank" rel="external">ReactiveCocoa</a>是一个Cocoa的扩展框架，它是<a href="https://github.com/jspahrsummers" title="Justin Spahr-Summers" target="_blank" rel="external">Justin Spahr-Summers</a>和<a href="https://github.com/joshaber" target="_blank" rel="external">Josh Abernathy</a>在开发<a href="https://desktop.github.com/" target="_blank" rel="external">GitHub for Mac</a>的过程中的副产物。ReactiveCocoa受<code>Functional Reactive Programming(FRP)</code>的启发，但是最近他们提到也受到过Rx的启发。因此，可以说ReactiveCocoa是借鉴了一些Rx的精神，源自于FRP的一个框架。这两者是同一编程思想的两种不同实现。</p>
 <p>可以说，RxSwift和ReactiveCocoa是很神似的，它们都是函数式的、响应式的框架（但都不是真正意义上的<code>函数响应式</code>，后续文章会讲到）。但是又有一些不同点：</p>
 <ul>
 <li>ReactiveCocoa是一个有4年历史的框架，经历了很多大型项目的实践运用</li>
-<li>RxSwift时间短一点。但是社区非常有活力。此外，由于RxSwift是Rx的正统家族成员，因此，在RxSwift、RxJava、RxJs等框架间迁移十分方便。<br>此外，两者还有一些技术实现上的差别，这里先不做深入研究。</li>
+<li>RxSwift时间短一点。但是社区非常有活力。此外，由于RxSwift是Rx的正统家族成员，因此，在RxSwift、RxJava、RxJs等框架间迁移十分方便。可以说是「Learn once, apply everywhere」</li>
 </ul>
-<p>ReactiveCocoa的<code>2.5.0</code>版本及以下为Objective-C版本，<code>3.0.0</code>版本以上到最新的发布版本<code>6.0.0</code>为Swift版本，现在支持到Swift <code>3.0.x</code>。因此，如果使用Objective-C的话，ReactiveCocoa v2.5.0（现在改名叫<a href="https://github.com/ReactiveCocoa/ReactiveObjC" target="_blank" rel="external">ReactiveObjC</a>了）是你的选择。如果使用的是Swift的话，那么使用最新的ReactiveCocoa版本就OK。</p>
+<p>此外，两者还有一些技术实现上的差别，这主要体现在他们是如何处理「副作用」的。关于副作用，在后续的博文中会详细介绍，这里只需要理解成在创建一个可观察集合（ReactiveCocoa中为信号），以及对其进行观察时对该集合外部代码产生的影响：</p>
+<ul>
+<li>ReactiveCocoa中的核心概念是两种信号：<code>Signal</code>和<code>Signal Producer</code>，分别称为「冷信号」和「热信号」。ReactiveCocoa用这种概念的区分来处理副作用。</li>
+<li>RxSwift则只有一个核心概念：<code>Observable</code>。因此，在创建一个<code>Observable</code>时，要仔细考虑它应当是「冷信号」还是「热信号」。同样，这也是为了处理副作用。</li>
+</ul>
+<p>此外，尽管RxSwift和ReactiveCocoa对事件的定义都是类似的，都有三种类型的事件：</p>
+<ul>
+<li><code>Next</code>：新产生的值</li>
+<li><code>Error</code>：发送一个错误值，并终止该可观察集合（信号），移除对它的观察者</li>
+<li><code>Complete</code>：发送一个代表「完成」的值，并终止该可观察集合（信号），移除对它的观察者</li>
+</ul>
+<p>但是ReactiveCocoa中，当一个信号在正常结束前（发送一个<code>Error</code>或者<code>Complete</code>）就被销毁了，还会发送另外一种称为<code>Interruption</code>的值。</p>
+<p>除此之外，尽管还有一些细小的差别，但是RxSwift和ReactiveCocoa的用法和原理基本都是类似的。</p>
+<h3 id="我该使用哪个？"><a href="#我该使用哪个？" class="headerlink" title="我该使用哪个？"></a>我该使用哪个？</h3><p>在挑选去使用其中一个的时候，可以想想对于上述两个框架对「冷信号」和「热信号」的差别处理，你更接受哪个。</p>
+<p>此外，ReactiveCocoa一直在不断更新，以更适合开发者对Cocoa框架的使用习惯。因此，如果你对Cocoa框架的开发很有经验，应当会更容易上手ReactiveCocoa这个框架；相反，如果你之前熟悉Reactive Extension，例如RxJava，RxJs，Rx.Net等等，那么你会对RxSwift更加得心应手。</p>
+<p>ReactiveCocoa的<code>2.5.0</code>版本及以下为Objective-C版本，<code>3.0.0</code>版本以上到最新的发布版本<code>6.0.0</code>为Swift版本，现在支持到Swift <code>3.0.x</code>。因此，如果使用Objective-C的话，ReactiveCocoa v2.5.0（现在改名叫<a href="https://github.com/ReactiveCocoa/ReactiveObjC" target="_blank" rel="external">ReactiveObjC</a>了）是个不错的选择。如果使用的是Swift的话，那么使用最新的ReactiveCocoa版本就OK。</p>
 <hr>
-<h3 id="相关链接"><a href="#相关链接" class="headerlink" title="相关链接"></a>相关链接</h3><p><a href="http://reactivex.io/" target="_blank" rel="external">http://reactivex.io/</a><br><a href="https://stackoverflow.com/questions/32542846/reactivecocoa-vs-rxswift-pros-and-cons" target="_blank" rel="external">https://stackoverflow.com/questions/32542846/reactivecocoa-vs-rxswift-pros-and-cons</a></p>
+<h3 id="相关链接"><a href="#相关链接" class="headerlink" title="相关链接"></a>相关链接</h3><p><a href="http://reactivex.io/" target="_blank" rel="external">http://reactivex.io/</a></p>
+<p><a href="https://stackoverflow.com/questions/32542846/reactivecocoa-vs-rxswift-pros-and-cons" target="_blank" rel="external">https://stackoverflow.com/questions/32542846/reactivecocoa-vs-rxswift-pros-and-cons</a></p>
+<p><a href="http://blog.leichunfeng.com/blog/2015/12/25/reactivecocoa-v2-dot-5-yuan-ma-jie-xi-zhi-jia-gou-zong-lan/" target="_blank" rel="external">http://blog.leichunfeng.com/blog/2015/12/25/reactivecocoa-v2-dot-5-yuan-ma-jie-xi-zhi-jia-gou-zong-lan/</a></p>
 
       
     </div>
@@ -386,22 +406,6 @@
       
       
 
-      
-        <div class="post-nav">
-          <div class="post-nav-next post-nav-item">
-            
-          </div>
-
-          <span class="post-nav-divider"></span>
-
-          <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/08/13/hello-world/" rel="prev" title="Is this useful?">
-                Is this useful? <i class="fa fa-chevron-right"></i>
-              </a>
-            
-          </div>
-        </div>
       
 
       
@@ -452,10 +456,10 @@
       
         <ul class="sidebar-nav motion-element">
           <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
-            Table of Contents
+            文章目录
           </li>
           <li class="sidebar-nav-overview" data-target="site-overview">
-            Overview
+            站点概览
           </li>
         </ul>
       
@@ -463,7 +467,7 @@
       <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
-               src="/images/avatar.gif"
+               src="/images/avatar.jpg"
                alt="Sheep" />
           <p class="site-author-name" itemprop="name">Sheep</p>
            
@@ -475,8 +479,8 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">2</span>
-                <span class="site-state-item-name">posts</span>
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">日志</span>
               </a>
             </div>
           
@@ -487,7 +491,7 @@
             <div class="site-state-item site-state-categories">
               
                 <span class="site-state-item-count">1</span>
-                <span class="site-state-item-name">categories</span>
+                <span class="site-state-item-name">分类</span>
               
             </div>
           
@@ -523,7 +527,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#从Reactive-Extensions说起"><span class="nav-number">1.</span> <span class="nav-text">从Reactive Extensions说起</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RxSwift和ReactiveCocoa"><span class="nav-number">2.</span> <span class="nav-text">RxSwift和ReactiveCocoa</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#相关链接"><span class="nav-number">3.</span> <span class="nav-text">相关链接</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#从Reactive-Extensions说起"><span class="nav-number">1.</span> <span class="nav-text">从Reactive Extensions说起</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RxSwift和ReactiveCocoa"><span class="nav-number">2.</span> <span class="nav-text">RxSwift和ReactiveCocoa</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#我该使用哪个？"><span class="nav-number">3.</span> <span class="nav-text">我该使用哪个？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#相关链接"><span class="nav-number">4.</span> <span class="nav-text">相关链接</span></a></li></ol></div>
             
 
           </div>
@@ -555,11 +559,11 @@
 
 
 <div class="powered-by">
-  Powered by <a class="theme-link" href="https://hexo.io">Hexo</a>
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
 </div>
 
 <div class="theme-info">
-  Theme -
+  主题 -
   <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
     NexT.Muse
   </a>
