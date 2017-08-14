@@ -172,7 +172,7 @@
       </a>
     </div>
       
-        <p class="site-subtitle">In this life we trust</p>
+        <p class="site-subtitle">In This Life We Trust</p>
       
   </div>
 
@@ -368,7 +368,7 @@
 <li>ReactiveCocoa是一个有4年历史的框架，经历了很多大型项目的实践运用</li>
 <li>RxSwift时间短一点。但是社区非常有活力。此外，由于RxSwift是Rx的正统家族成员，因此，在RxSwift、RxJava、RxJs等框架间迁移十分方便。可以说是「Learn once, apply everywhere」</li>
 </ul>
-<p>此外，两者还有一些技术实现上的差别，这主要体现在他们是如何处理「副作用」的。关于副作用，在后续的博文中会详细介绍，这里只需要理解成在创建一个可观察集合（ReactiveCocoa中为信号），以及对其进行观察时对该集合外部代码产生的影响：</p>
+<p>此外，两者还有一些技术实现上的差别，这主要体现在他们是如何处理「副作用」的。关于副作用（Side-Effect），在后续的博文中会详细介绍，这里只需要理解成在创建一个可观察集合（ReactiveCocoa中为信号），以及对其进行观察时对该集合外部代码产生的影响：</p>
 <ul>
 <li>ReactiveCocoa中的核心概念是两种信号：<code>Signal</code>和<code>Signal Producer</code>，分别称为「冷信号」和「热信号」。ReactiveCocoa用这种概念的区分来处理副作用。</li>
 <li>RxSwift则只有一个核心概念：<code>Observable</code>。因此，在创建一个<code>Observable</code>时，要仔细考虑它应当是「冷信号」还是「热信号」。同样，这也是为了处理副作用。</li>
