@@ -78,7 +78,7 @@
 <link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="ReactiveCocoa,iOS," />
 
 
 
@@ -95,13 +95,14 @@
 
 
 <meta name="description" content="最近很长一段时间在研究ReactiveCocoa这个框架，因此将会写一系列的文章来记录和总结一下学习过程中的心得体会。本文是这个系列的第一篇，主要介绍了ReactiveCocoa的诞生和发展。  就像公司招聘员工工作之前，都要从简历来了解员工前面的学习、工作经历一样。我们在深入了解ReactiveCocoa这个强有力的工具之前，也有必要来了解一下它的前世今生，这也有助于更好理解它的核心思想和工作">
+<meta name="keywords" content="ReactiveCocoa,iOS">
 <meta property="og:type" content="article">
 <meta property="og:title" content="ReactiveCocoa学习笔记（一）：ReactiveCocoa的前世今生">
 <meta property="og:url" content="http://yoursite.com/2017/08/11/ReactiveCocoa学习笔记（一）：ReactiveCocoa的前世今生/index.html">
 <meta property="og:site_name" content="Sheep&#39;s Blog">
 <meta property="og:description" content="最近很长一段时间在研究ReactiveCocoa这个框架，因此将会写一系列的文章来记录和总结一下学习过程中的心得体会。本文是这个系列的第一篇，主要介绍了ReactiveCocoa的诞生和发展。  就像公司招聘员工工作之前，都要从简历来了解员工前面的学习、工作经历一样。我们在深入了解ReactiveCocoa这个强有力的工具之前，也有必要来了解一下它的前世今生，这也有助于更好理解它的核心思想和工作">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2017-08-14T02:16:13.000Z">
+<meta property="og:updated_time" content="2017-08-14T12:00:08.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ReactiveCocoa学习笔记（一）：ReactiveCocoa的前世今生">
 <meta name="twitter:description" content="最近很长一段时间在研究ReactiveCocoa这个框架，因此将会写一系列的文章来记录和总结一下学习过程中的心得体会。本文是这个系列的第一篇，主要介绍了ReactiveCocoa的诞生和发展。  就像公司招聘员工工作之前，都要从简历来了解员工前面的学习、工作经历一样。我们在深入了解ReactiveCocoa这个强有力的工具之前，也有必要来了解一下它的前世今生，这也有助于更好理解它的核心思想和工作">
@@ -200,6 +201,16 @@
               <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
             
             首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
           </a>
         </li>
       
@@ -308,8 +319,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/blog/" itemprop="url" rel="index">
-                    <span itemprop="name">blog</span>
+                  <a href="/categories/Blog/" itemprop="url" rel="index">
+                    <span itemprop="name">Blog</span>
                   </a>
                 </span>
 
@@ -324,6 +335,17 @@
           
 
           
+          
+             <span id="/2017/08/11/ReactiveCocoa学习笔记（一）：ReactiveCocoa的前世今生/" class="leancloud_visitors" data-flag-title="ReactiveCocoa学习笔记（一）：ReactiveCocoa的前世今生">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
           
 
           
@@ -400,6 +422,14 @@
     
 
     <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/ReactiveCocoa/" rel="tag"># ReactiveCocoa</a>
+          
+            <a href="/tags/iOS/" rel="tag"># iOS</a>
+          
+        </div>
       
 
       
@@ -489,13 +519,22 @@
             
             
             <div class="site-state-item site-state-categories">
-              
+              <a href="/categories/index.html">
                 <span class="site-state-item-count">1</span>
                 <span class="site-state-item-name">分类</span>
-              
+              </a>
             </div>
           
 
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
           
 
         </nav>
@@ -698,6 +737,113 @@
 
 
   
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("GwKJDV9gM63F0OOouV9L2GVq-gzGzoHsz", "F9uWRrVJ94EkiJGaUXHGNS3s");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
 
   
 
