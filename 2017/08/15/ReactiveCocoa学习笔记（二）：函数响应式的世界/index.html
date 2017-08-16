@@ -78,7 +78,7 @@
 <link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="ReactiveCocoa,iOS," />
 
 
 
@@ -94,13 +94,18 @@
 
 
 
-<meta property="og:type" content="website">
-<meta property="og:title" content="Sheep&#39;s Blog">
-<meta property="og:url" content="http://yoursite.com/tags/iOS/index.html">
+<meta name="description" content="本文主要讲了函数式编程、响应式编程、函数响应式编程的概念，以及我自己对它们的理解。">
+<meta name="keywords" content="ReactiveCocoa,iOS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ReactiveCocoa学习笔记（二）：函数响应式的世界">
+<meta property="og:url" content="http://yoursite.com/2017/08/15/ReactiveCocoa学习笔记（二）：函数响应式的世界/index.html">
 <meta property="og:site_name" content="Sheep&#39;s Blog">
+<meta property="og:description" content="本文主要讲了函数式编程、响应式编程、函数响应式编程的概念，以及我自己对它们的理解。">
 <meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2017-08-15T06:31:14.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Sheep&#39;s Blog">
+<meta name="twitter:title" content="ReactiveCocoa学习笔记（二）：函数响应式的世界">
+<meta name="twitter:description" content="本文主要讲了函数式编程、响应式编程、函数响应式编程的概念，以及我自己对它们的理解。">
 
 
 
@@ -129,13 +134,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/tags/iOS/"/>
+  <link rel="canonical" href="http://yoursite.com/2017/08/15/ReactiveCocoa学习笔记（二）：函数响应式的世界/"/>
 
 
 
 
 
-  <title>标签: iOS | Sheep's Blog</title>
+  <title>ReactiveCocoa学习笔记（二）：函数响应式的世界 | Sheep's Blog</title>
   
 
 
@@ -154,7 +159,7 @@
     
   
 
-  <div class="container sidebar-position-left  ">
+  <div class="container sidebar-position-left page-post-detail ">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -248,82 +253,184 @@
           <div id="content" class="content">
             
 
-  
-  
-  
-  <div class="post-block tag">
+  <div id="posts" class="posts-expand">
+    
 
-    <div id="posts" class="posts-collapse">
-      <div class="collection-title">
-        <h1>iOS<small>标签</small>
-        </h1>
-      </div>
+  
 
-      
-        
+  
+  
+  
 
   <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/08/15/ReactiveCocoa学习笔记（二）：函数响应式的世界/">
 
-      <h2 class="post-title">
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Sheep">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Sheep's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
         
-            <a class="post-title-link" href="/2017/08/15/ReactiveCocoa学习笔记（二）：函数响应式的世界/" itemprop="url">
-              
-                <span itemprop="name">ReactiveCocoa学习笔记（二）：函数响应式的世界</span>
-              
-            </a>
         
-      </h2>
+          <h1 class="post-title" itemprop="name headline">ReactiveCocoa学习笔记（二）：函数响应式的世界</h1>
+        
 
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2017-08-15T14:28:26+08:00"
-              content="2017-08-15" >
-          08-15
-        </time>
-      </div>
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-15T14:28:26+08:00">
+                2017-08-15
+              </time>
+            
 
-    </header>
-  </article>
+            
 
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Blog/" itemprop="url" rel="index">
+                    <span itemprop="name">Blog</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2017/08/15/ReactiveCocoa学习笔记（二）：函数响应式的世界/" class="leancloud_visitors" data-flag-title="ReactiveCocoa学习笔记（二）：函数响应式的世界">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
       
-        
+      
 
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2017/08/11/ReactiveCocoa学习笔记（一）：ReactiveCocoa的前世今生/" itemprop="url">
-              
-                <span itemprop="name">ReactiveCocoa学习笔记（一）：ReactiveCocoa的前世今生</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2017-08-11T21:37:54+08:00"
-              content="2017-08-11" >
-          08-11
-        </time>
-      </div>
-
-    </header>
-  </article>
-
+      
+        <blockquote>
+<p>本文主要讲了函数式编程、响应式编程、函数响应式编程的概念，以及我自己对它们的理解。</p>
+</blockquote>
 
       
     </div>
+    
+    
+    
 
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/ReactiveCocoa/" rel="tag"># ReactiveCocoa</a>
+          
+            <a href="/tags/iOS/" rel="tag"># iOS</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/08/11/ReactiveCocoa学习笔记（一）：ReactiveCocoa的前世今生/" rel="next" title="ReactiveCocoa学习笔记（一）：ReactiveCocoa的前世今生">
+                <i class="fa fa-chevron-left"></i> ReactiveCocoa学习笔记（一）：ReactiveCocoa的前世今生
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
   </div>
   
   
   
+  </article>
 
-  
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
@@ -331,6 +438,10 @@
 
 
           
+  <div class="comments" id="comments">
+    
+  </div>
+
 
         </div>
         
@@ -533,10 +644,10 @@
   
 
   
-    <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
 <script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
 
-  
+
 
   
 

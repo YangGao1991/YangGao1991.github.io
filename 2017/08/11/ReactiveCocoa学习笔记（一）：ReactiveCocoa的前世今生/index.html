@@ -94,18 +94,18 @@
 
 
 
-<meta name="description" content="最近很长一段时间在研究ReactiveCocoa这个框架，因此将会写一系列的文章来记录和总结一下学习过程中的心得体会。本文是这个系列的第一篇，主要介绍了ReactiveCocoa的诞生和发展。  就像公司招聘员工工作之前，都要从简历来了解员工前面的学习、工作经历一样。我们在深入了解ReactiveCocoa这个强有力的工具之前，也有必要来了解一下它的前世今生，这也有助于更好理解它的核心思想和工作">
+<meta name="description" content="最近很长一段时间在研究ReactiveCocoa这个框架，因此将会写一系列的文章来记录和总结一下学习过程中的心得体会。本文是这个系列的第一篇，主要介绍了ReactiveCocoa的诞生背景和发展，以及现在的版本情况。  就像公司招聘员工工作之前，都要从简历来了解员工前面的学习、工作经历一样。我们在深入了解ReactiveCocoa这个强有力的工具之前，也有必要来了解一下它的前世今生，这也有助于更">
 <meta name="keywords" content="ReactiveCocoa,iOS">
 <meta property="og:type" content="article">
 <meta property="og:title" content="ReactiveCocoa学习笔记（一）：ReactiveCocoa的前世今生">
 <meta property="og:url" content="http://yoursite.com/2017/08/11/ReactiveCocoa学习笔记（一）：ReactiveCocoa的前世今生/index.html">
 <meta property="og:site_name" content="Sheep&#39;s Blog">
-<meta property="og:description" content="最近很长一段时间在研究ReactiveCocoa这个框架，因此将会写一系列的文章来记录和总结一下学习过程中的心得体会。本文是这个系列的第一篇，主要介绍了ReactiveCocoa的诞生和发展。  就像公司招聘员工工作之前，都要从简历来了解员工前面的学习、工作经历一样。我们在深入了解ReactiveCocoa这个强有力的工具之前，也有必要来了解一下它的前世今生，这也有助于更好理解它的核心思想和工作">
+<meta property="og:description" content="最近很长一段时间在研究ReactiveCocoa这个框架，因此将会写一系列的文章来记录和总结一下学习过程中的心得体会。本文是这个系列的第一篇，主要介绍了ReactiveCocoa的诞生背景和发展，以及现在的版本情况。  就像公司招聘员工工作之前，都要从简历来了解员工前面的学习、工作经历一样。我们在深入了解ReactiveCocoa这个强有力的工具之前，也有必要来了解一下它的前世今生，这也有助于更">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2017-08-14T12:00:08.000Z">
+<meta property="og:updated_time" content="2017-08-16T06:27:25.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ReactiveCocoa学习笔记（一）：ReactiveCocoa的前世今生">
-<meta name="twitter:description" content="最近很长一段时间在研究ReactiveCocoa这个框架，因此将会写一系列的文章来记录和总结一下学习过程中的心得体会。本文是这个系列的第一篇，主要介绍了ReactiveCocoa的诞生和发展。  就像公司招聘员工工作之前，都要从简历来了解员工前面的学习、工作经历一样。我们在深入了解ReactiveCocoa这个强有力的工具之前，也有必要来了解一下它的前世今生，这也有助于更好理解它的核心思想和工作">
+<meta name="twitter:description" content="最近很长一段时间在研究ReactiveCocoa这个框架，因此将会写一系列的文章来记录和总结一下学习过程中的心得体会。本文是这个系列的第一篇，主要介绍了ReactiveCocoa的诞生背景和发展，以及现在的版本情况。  就像公司招聘员工工作之前，都要从简历来了解员工前面的学习、工作经历一样。我们在深入了解ReactiveCocoa这个强有力的工具之前，也有必要来了解一下它的前世今生，这也有助于更">
 
 
 
@@ -368,7 +368,7 @@
 
       
         <blockquote>
-<p>最近很长一段时间在研究ReactiveCocoa这个框架，因此将会写一系列的文章来记录和总结一下学习过程中的心得体会。本文是这个系列的第一篇，主要介绍了ReactiveCocoa的诞生和发展。</p>
+<p>最近很长一段时间在研究ReactiveCocoa这个框架，因此将会写一系列的文章来记录和总结一下学习过程中的心得体会。本文是这个系列的第一篇，主要介绍了ReactiveCocoa的诞生背景和发展，以及现在的版本情况。</p>
 </blockquote>
 <p>就像公司招聘员工工作之前，都要从简历来了解员工前面的学习、工作经历一样。我们在深入了解ReactiveCocoa这个强有力的工具之前，也有必要来了解一下它的前世今生，这也有助于更好理解它的核心思想和工作方式。</p>
 <h3 id="从Reactive-Extensions说起"><a href="#从Reactive-Extensions说起" class="headerlink" title="从Reactive Extensions说起"></a>从Reactive Extensions说起</h3><p>C#3.0中引入了Language Integrated Query（LINQ）这种语言特性。LINQ是对.NET的一个扩展，提供了统一的语法来从不同数据源中查询和提取数据。它的函数性和声明式语法使得我们的处理逻辑变得简单清晰。</p>
@@ -401,13 +401,20 @@
 </ul>
 <p>但是ReactiveCocoa中，当一个信号在正常结束前（发送一个<code>Error</code>或者<code>Complete</code>）就被销毁了，还会发送另外一种称为<code>Interruption</code>的值。</p>
 <p>除此之外，尽管还有一些细小的差别，但是RxSwift和ReactiveCocoa的用法和原理基本都是类似的。</p>
-<h3 id="我该使用哪个？"><a href="#我该使用哪个？" class="headerlink" title="我该使用哪个？"></a>我该使用哪个？</h3><p>在挑选去使用其中一个的时候，可以想想对于上述两个框架对「冷信号」和「热信号」的差别处理，你更接受哪个。</p>
+<h3 id="项目中该如何选择？"><a href="#项目中该如何选择？" class="headerlink" title="项目中该如何选择？"></a>项目中该如何选择？</h3><p>在挑选去使用其中一个的时候，可以想想对于上述两个框架对「冷信号」和「热信号」的差别处理，你更接受哪个。</p>
 <p>此外，ReactiveCocoa一直在不断更新，以更适合开发者对Cocoa框架的使用习惯。因此，如果你对Cocoa框架的开发很有经验，应当会更容易上手ReactiveCocoa这个框架；相反，如果你之前熟悉Reactive Extension，例如RxJava，RxJs，Rx.Net等等，那么你会对RxSwift更加得心应手。</p>
-<p>ReactiveCocoa的<code>2.5.0</code>版本及以下为Objective-C版本，<code>3.0.0</code>版本以上到最新的发布版本<code>6.0.0</code>为Swift版本，现在支持到Swift <code>3.0.x</code>。因此，如果使用Objective-C的话，ReactiveCocoa v2.5.0（现在改名叫<a href="https://github.com/ReactiveCocoa/ReactiveObjC" target="_blank" rel="external">ReactiveObjC</a>了）是个不错的选择。如果使用的是Swift的话，那么使用最新的ReactiveCocoa版本就OK。</p>
+<p>ReactiveCocoa的<code>2.5.0</code>版本及以下为Objective-C版本，<code>3.0.0</code>版本以上到最新的发布版本<code>6.0.0</code>为Swift版本，现在支持到Swift <code>3.0.x</code>。此外，原来的ReactiveCocoa库现在被拆分成了四个库：</p>
+<ul>
+<li><a href="https://github.com/ReactiveCocoa/ReactiveCocoa" target="_blank" rel="external">ReactiveCocoa</a>：现如今的ReactiveCocoa库主要是作为<code>UIKit</code>和<code>AppKit</code>的扩展，所做的更多是业务方面的工作。依赖于ReactiveSwift。</li>
+<li><a href="https://github.com/ReactiveCocoa/ReactiveSwift/" target="_blank" rel="external">ReactiveSwift</a>：ReactiveSwift是原来ReactiveCocoa库中拆分出来的只和Swift相关的核心库。这个库非常精简，且不依赖平台。ReactiveCocoa + ReactiveSwift可以用来完成<code>Cocoa</code>和<code>CocoaTouch</code>的开发， 而毕竟Swift已经是一门开源的语言，所以将ReactiveSwift分离出来以适用于其他平台的开发。</li>
+<li><a href="https://github.com/ReactiveCocoa/ReactiveObjC" target="_blank" rel="external">ReactiveObjC</a>：这就是原来ReactiveCocoa库中Objective-C相关的部分。它和ReactiveSwift算是同胞兄弟的关系，一样的功能，两套API。</li>
+<li><a href="https://github.com/ReactiveCocoa/ReactiveObjCBridge" target="_blank" rel="external">ReactiveObjcBridge</a>：由于上述ReactiveObjc和ReactiveSwift的兄弟分家，于是就有了ReactiveObjcBridge这个桥接这两套API的库。它可用于一些老的项目从Objective-C向Swift转换，或是Objective-C和Swift混编的项目。</li>
+</ul>
 <hr>
 <h3 id="相关链接"><a href="#相关链接" class="headerlink" title="相关链接"></a>相关链接</h3><p><a href="http://reactivex.io/" target="_blank" rel="external">http://reactivex.io/</a></p>
 <p><a href="https://stackoverflow.com/questions/32542846/reactivecocoa-vs-rxswift-pros-and-cons" target="_blank" rel="external">https://stackoverflow.com/questions/32542846/reactivecocoa-vs-rxswift-pros-and-cons</a></p>
 <p><a href="http://blog.leichunfeng.com/blog/2015/12/25/reactivecocoa-v2-dot-5-yuan-ma-jie-xi-zhi-jia-gou-zong-lan/" target="_blank" rel="external">http://blog.leichunfeng.com/blog/2015/12/25/reactivecocoa-v2-dot-5-yuan-ma-jie-xi-zhi-jia-gou-zong-lan/</a></p>
+<p><a href="http://blog.luckymore.wang/2017/03/01/MVVM-ReactiveSwift-ReactiveCocoa/" target="_blank" rel="external">http://blog.luckymore.wang/2017/03/01/MVVM-ReactiveSwift-ReactiveCocoa/</a></p>
 
       
     </div>
@@ -436,6 +443,22 @@
       
       
 
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/08/15/ReactiveCocoa学习笔记（二）：函数响应式的世界/" rel="prev" title="ReactiveCocoa学习笔记（二）：函数响应式的世界">
+                ReactiveCocoa学习笔记（二）：函数响应式的世界 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
       
 
       
@@ -509,7 +532,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-count">2</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -566,7 +589,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#从Reactive-Extensions说起"><span class="nav-number">1.</span> <span class="nav-text">从Reactive Extensions说起</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RxSwift和ReactiveCocoa"><span class="nav-number">2.</span> <span class="nav-text">RxSwift和ReactiveCocoa</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#我该使用哪个？"><span class="nav-number">3.</span> <span class="nav-text">我该使用哪个？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#相关链接"><span class="nav-number">4.</span> <span class="nav-text">相关链接</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#从Reactive-Extensions说起"><span class="nav-number">1.</span> <span class="nav-text">从Reactive Extensions说起</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RxSwift和ReactiveCocoa"><span class="nav-number">2.</span> <span class="nav-text">RxSwift和ReactiveCocoa</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#项目中该如何选择？"><span class="nav-number">3.</span> <span class="nav-text">项目中该如何选择？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#相关链接"><span class="nav-number">4.</span> <span class="nav-text">相关链接</span></a></li></ol></div>
             
 
           </div>
