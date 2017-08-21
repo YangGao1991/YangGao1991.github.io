@@ -283,7 +283,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/08/15/ReactiveCocoa学习笔记（二）：函数响应式的世界/" itemprop="url">ReactiveCocoa学习笔记（二）：函数响应式的世界</a></h1>
+                <a class="post-title-link" href="/2017/08/15/ReactiveCocoa学习笔记（二）：函数响应式的世界/" itemprop="url">ReactiveCocoa学习笔记（二）：函数式的世界</a></h1>
         
 
         <div class="post-meta">
@@ -335,7 +335,7 @@
 
           
           
-             <span id="/2017/08/15/ReactiveCocoa学习笔记（二）：函数响应式的世界/" class="leancloud_visitors" data-flag-title="ReactiveCocoa学习笔记（二）：函数响应式的世界">
+             <span id="/2017/08/15/ReactiveCocoa学习笔记（二）：函数响应式的世界/" class="leancloud_visitors" data-flag-title="ReactiveCocoa学习笔记（二）：函数式的世界">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -369,8 +369,55 @@
         
           
             <blockquote>
-<p>本文主要讲了函数式编程、响应式编程、函数响应式编程的概念，以及我自己对它们的理解。</p>
+<p>本文主要讲了我自己对函数式编程的理解。涉及到编程范式的方面，个人的理解不免有遗漏、不准确甚至错误的地方，希望能多多批评、交流、指正。</p>
 </blockquote>
+<p>我们认识事物，总是要问一下「What」「Why」「How」。那么，ReactiveCocoa是什么呢？</p>
+<p>说到ReactiveCocoa，相信大部分看过介绍的人都会看到一句开场白：</p>
+<blockquote>
+<p>ReactiveCocoa是一个函数式响应式的编程框架。</p>
+</blockquote>
+<p>WTF，这个<code>函数式响应式编程</code>是个什么鬼？这一篇文章，希望从我的理解出发，先来聊聊函数式编程。</p>
+<h2 id="函数式编程是什么"><a href="#函数式编程是什么" class="headerlink" title="函数式编程是什么"></a>函数式编程是什么</h2><p>介绍函数式编程的文章，一般都逃不过这句话：</p>
+<blockquote>
+<p>函数式编程中，函数是一等公民。（Functions are first-class objects）</p>
+</blockquote>
+<p>怎么去理解这句话呢？我的理解是，<em>无论是函数式编程中的「函数是一等公民」，还是面向对象式编程中的「万物皆对象」，都是对事物的不同抽象方式</em>。</p>
+<p>在面向对象式的编程中，<code>类</code>和<code>对象</code>的概念深入人心。我们的类是「人」，阿猫阿狗的类是「宠物」，我们都有一个父类「动物」（这些话在每本面向对象语言的入门书籍中都会出现）。而<code>行为</code>必须依赖于<code>类</code>或<code>对象</code>，比如「吃东西」是「动物」的一个行为，所以子类「人」和「宠物」都会吃东西。寻找事物的共同点，并把它们归类，面向对象以这种抽象方式来描述这个世界。</p>
+<p>而函数式编程则换了一种思路：它是对<code>行为</code>的抽象。在函数式编程里，「吃东西」就是「吃东西」，输入一些食物，输出一些经过加工的结果（咳咳，这里就不具体说是什么了……），这是多么纯粹的一个行为。既然只涉及到对食物（数据）的处理这一行为，那为什么需要具体的类呢？类似的还有对「睡觉」，「打豆豆」……等等行为的抽象。这些对行为的抽象是函数式编程对这个世界的描述方式。</p>
+<p>既然是一等公民，那么自然地，函数式编程中，函数可以以参数、返回值的形式从一个函数传递到另一个函数，也就产生了高阶函数。这种传递本质上是对数据的流式处理。</p>
+<p>举个栗子，「计算一个数乘以3的结果」，这是一个相当纯粹的行为吧，我们很容易写出这样的函数：</p>
+<pre><code>[代码1]
+- (NSNumber *)multipliedByThree:(NSNumber *)x {
+    return @(x.integerValue * 3);
+}
+</code></pre><p>输入一个参数，输出一个结果，平平无奇的一个函数哈。但如果刚好有另外一个函数，它能够对一个集合里的所有元素进行一个操作，然后返回一个新集合：</p>
+<pre><code>[代码2]
+@implement NSArray+SomeExcute
+
+- (NSArray *)map:(id (^)(id obj))block
+{
+    NSMutableArray *result = [NSMutableArray arrayWithCapacity:self.count];
+&apos;&apos;     [self enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+        id value = block(obj) ?: [NSNull null];
+        [result addObject:value];
+    }];
+    return result;
+}
+</code></pre><p>那么，我们就可以将<code>multipliedByThree</code>这个函数和<code>map</code>这个函数进行一次激情的碰撞：</p>
+<pre><code>[代码3]
+[@[@(1), @(2), @(3), @(4)] map:^id(id x){
+        return @(x.integerValue * 3);
+}]
+</code></pre><p>瞬间就将原来的数组变成了另外一个经过处理的数组了有木有。</p>
+<p>虽然代码很简单，但是还是可以分析一下：<code>multipliedByThree</code>函数是我们对一个处理数据的<code>行为</code>的抽象，<code>map</code>也是我们对一个处理数据（数组或其他集合）的<code>行为</code>的抽象，同时，<code>map</code>是一个高阶函数：它接受另一个函数作为参数。通过<code>multipliedByThree</code>和<code>map</code>的抽象，我们得以在<code>代码3</code>中，使用简明干练的语法和代码，完成对一个集合的复杂处理：<em>我们需要返回一个新数组，它的每一个元素值都是原数组中对应值的3倍</em>。</p>
+<p>注意上面的这句斜体字，这是很直观的一个「声明式」的语句。再回头看看上面的<code>代码3</code>，你会发现这段代码也充满了「声明式」的意味。我们在这里只是告诉计算机，我们「需要的」是什么，而不是去描述我们应当「怎么去做」（遍历集合中的每个元素，将该值乘以3，并添加到一个新的集合中，最后返回这个新的集合）。这正是函数式编程的魅力：它将原本的<code>命令式编程(Imperative)</code>变成了<code>声明式编程(Declarative)</code>，将「How to do 」变成了「What we want」，使得代码更加简洁明了和具有自注释性。然而我们也要记得，是<code>map</code>函数内部帮我们做了这些<code>Imperative</code>的工作。这正是对<code>行为</code>抽象的作用：寻找行为的共同点，并将它们抽象成函数，从而将「命令式」的「dirty work」封装在基础的函数中。</p>
+<p>对于上面这几段代码，还有两点想补充解释：</p>
+<ol>
+<li>Objective-C是一门面向对象的语言，对函数式编程的支持很弱。所以这里的<code>map</code>函数表现为<code>NSArray</code>的一个方法。但是，从本质上说，这个操作是普遍存在的，不依赖于这一个类的。</li>
+<li><code>map</code>函数的内部实现使用了循环。虽然在遍历一个集合的时候，使用循环是无可厚非的，但是函数式编程中的函数内部，应当是使用递归而不是循环。递归也是「自解释性」的，「声明式」的，而循环则是「命令式」的代码。更重要的是，循环是会使用到变量和状态，而这正是函数式编程想要消除的（下节会讲到）。</li>
+</ol>
+<h2 id="函数式编程中的函数"><a href="#函数式编程中的函数" class="headerlink" title="函数式编程中的函数"></a>函数式编程中的函数</h2><hr>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="http://mp.weixin.qq.com/s/qqPg0JujBIUNQPQMxjjlZQ" target="_blank" rel="external">http://mp.weixin.qq.com/s/qqPg0JujBIUNQPQMxjjlZQ</a></p>
 
           
         
@@ -535,21 +582,21 @@
 <li>基于事件（event-based）：Rx处理的是（未来的）数据/事件的集合，并提供了一系列的操作工具来声明式地处理这些集合。</li>
 </ul>
 <p>Rx使用一种可观察集合（Observable Sequence）来实现上述功能。可观察集合是Rx的核心，它是代表未来的值/事件的一个集合。我们声明了异步处理这些值的方式，这样当未来的值被添加到集合中的时候，我们便能够观察到（接收到）这些值并进行处理。</p>
-<h2 id="RxSwift和ReactiveCocoa"><a href="#RxSwift和ReactiveCocoa" class="headerlink" title="RxSwift和ReactiveCocoa"></a>RxSwift和ReactiveCocoa</h2><p>Rx是一个很大的家族，号称「ReactiveX is everywhere, and it’s meant for everything」。各大主流编程语言中都有它的身影，比如Java的RxJava，JavaScript的RxJS，C++的RxCpp等。从前端到后端，Rx家族都有很大的舞台。对于移动端来说，也有这么一个大家族的成员——Swift的<a href="https://github.com/ReactiveX/RxSwift" target="_blank" rel="external">RxSwift</a>。</p>
+<h2 id="RxSwift和ReactiveCocoa"><a href="#RxSwift和ReactiveCocoa" class="headerlink" title="RxSwift和ReactiveCocoa"></a>RxSwift和ReactiveCocoa</h2><p>Rx是一个很大的家族，号称「ReactiveX is everywhere, and it’s meant for everything」。各大主流编程语言中都有它的身影，比如Java的RxJava，JavaScript的RxJS，C++的RxCpp等。从前端到后端，Rx家族都有很大的舞台。对于移动端iOS开发来说，也有这么一个大家族的成员——Swift的<a href="https://github.com/ReactiveX/RxSwift" target="_blank" rel="external">RxSwift</a>。</p>
 <p>是的，RxSwift才是Rx家族的正统血统。那么，我们的主角ReactiveCocoa和它有什么关系呢？</p>
 <p>并没有什么关系（手动滑稽）。</p>
 <p><a href="https://github.com/ReactiveCocoa/ReactiveCocoa" target="_blank" rel="external">ReactiveCocoa</a>是一个Cocoa的扩展框架，它是<a href="https://github.com/jspahrsummers" title="Justin Spahr-Summers" target="_blank" rel="external">Justin Spahr-Summers</a>和<a href="https://github.com/joshaber" target="_blank" rel="external">Josh Abernathy</a>在开发<a href="https://desktop.github.com/" target="_blank" rel="external">GitHub for Mac</a>的过程中的副产物。ReactiveCocoa受<code>Functional Reactive Programming(FRP)</code>的启发，但是最近他们提到也受到过Rx的启发。因此，可以说ReactiveCocoa是借鉴了一些Rx的精神，源自于FRP的一个框架。这两者是同一编程思想的两种不同实现。</p>
-<p>可以说，RxSwift和ReactiveCocoa是很神似的，它们都是函数式的、响应式的框架（但都不是真正意义上的<code>函数响应式</code>，后续文章会讲到）。但是又有一些不同点：</p>
+<p>RxSwift和ReactiveCocoa是很神似的，它们都是函数式的、响应式的框架（但都不是真正意义上的<code>函数响应式</code>，后续文章会讲到）。但是又有一些不同点：</p>
 <ul>
 <li>ReactiveCocoa是一个有4年历史的框架，经历了很多大型项目的实践运用</li>
-<li>RxSwift时间短一点。但是社区非常有活力。此外，由于RxSwift是Rx的正统家族成员，因此，在RxSwift、RxJava、RxJs等框架间迁移十分方便。可以说是「Learn once, apply everywhere」</li>
+<li>RxSwift时间短一点。但是社区非常有活力。另外，由于RxSwift是Rx的正统家族成员，因此，在RxSwift、RxJava、RxJs等框架间迁移十分方便，可以说是「Learn once, apply everywhere」</li>
 </ul>
 <p>此外，两者还有一些技术实现上的差别，这主要体现在他们是如何处理「副作用」的。关于副作用（Side-Effect），在后续的博文中会详细介绍，这里只需要理解成在创建一个可观察集合（ReactiveCocoa中为信号），以及对其进行观察时对该集合外部代码产生的影响：</p>
 <ul>
 <li>ReactiveCocoa中的核心概念是两种信号：<code>Signal</code>和<code>Signal Producer</code>，分别称为「冷信号」和「热信号」。ReactiveCocoa用这种概念的区分来处理副作用。</li>
 <li>RxSwift则只有一个核心概念：<code>Observable</code>。因此，在创建一个<code>Observable</code>时，要仔细考虑它应当是「冷信号」还是「热信号」。同样，这也是为了处理副作用。</li>
 </ul>
-<p>此外，尽管RxSwift和ReactiveCocoa对事件的定义都是类似的，都有三种类型的事件：</p>
+<p>另外，尽管RxSwift和ReactiveCocoa对事件的定义都是类似的，都有三种类型的事件：</p>
 <ul>
 <li><code>Next</code>：新产生的值</li>
 <li><code>Error</code>：发送一个错误值，并终止该可观察集合（信号），移除对它的观察者</li>

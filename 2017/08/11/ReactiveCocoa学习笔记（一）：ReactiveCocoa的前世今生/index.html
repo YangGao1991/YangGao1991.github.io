@@ -102,7 +102,7 @@
 <meta property="og:site_name" content="Sheep&#39;s Blog">
 <meta property="og:description" content="最近很长一段时间在研究ReactiveCocoa这个框架，因此将会写一系列的文章来记录和总结一下学习过程中的心得体会。本文是这个系列的第一篇，主要介绍了ReactiveCocoa的诞生背景和发展，以及现在的版本情况。  就像公司招聘员工工作之前，都要从简历来了解员工前面的学习、工作经历一样。我们在深入了解ReactiveCocoa这个强有力的工具之前，也有必要来了解一下它的前世今生，这也有助于更">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2017-08-16T09:04:42.000Z">
+<meta property="og:updated_time" content="2017-08-16T10:45:59.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ReactiveCocoa学习笔记（一）：ReactiveCocoa的前世今生">
 <meta name="twitter:description" content="最近很长一段时间在研究ReactiveCocoa这个框架，因此将会写一系列的文章来记录和总结一下学习过程中的心得体会。本文是这个系列的第一篇，主要介绍了ReactiveCocoa的诞生背景和发展，以及现在的版本情况。  就像公司招聘员工工作之前，都要从简历来了解员工前面的学习、工作经历一样。我们在深入了解ReactiveCocoa这个强有力的工具之前，也有必要来了解一下它的前世今生，这也有助于更">
@@ -379,21 +379,21 @@
 <li>基于事件（event-based）：Rx处理的是（未来的）数据/事件的集合，并提供了一系列的操作工具来声明式地处理这些集合。</li>
 </ul>
 <p>Rx使用一种可观察集合（Observable Sequence）来实现上述功能。可观察集合是Rx的核心，它是代表未来的值/事件的一个集合。我们声明了异步处理这些值的方式，这样当未来的值被添加到集合中的时候，我们便能够观察到（接收到）这些值并进行处理。</p>
-<h2 id="RxSwift和ReactiveCocoa"><a href="#RxSwift和ReactiveCocoa" class="headerlink" title="RxSwift和ReactiveCocoa"></a>RxSwift和ReactiveCocoa</h2><p>Rx是一个很大的家族，号称「ReactiveX is everywhere, and it’s meant for everything」。各大主流编程语言中都有它的身影，比如Java的RxJava，JavaScript的RxJS，C++的RxCpp等。从前端到后端，Rx家族都有很大的舞台。对于移动端来说，也有这么一个大家族的成员——Swift的<a href="https://github.com/ReactiveX/RxSwift" target="_blank" rel="external">RxSwift</a>。</p>
+<h2 id="RxSwift和ReactiveCocoa"><a href="#RxSwift和ReactiveCocoa" class="headerlink" title="RxSwift和ReactiveCocoa"></a>RxSwift和ReactiveCocoa</h2><p>Rx是一个很大的家族，号称「ReactiveX is everywhere, and it’s meant for everything」。各大主流编程语言中都有它的身影，比如Java的RxJava，JavaScript的RxJS，C++的RxCpp等。从前端到后端，Rx家族都有很大的舞台。对于移动端iOS开发来说，也有这么一个大家族的成员——Swift的<a href="https://github.com/ReactiveX/RxSwift" target="_blank" rel="external">RxSwift</a>。</p>
 <p>是的，RxSwift才是Rx家族的正统血统。那么，我们的主角ReactiveCocoa和它有什么关系呢？</p>
 <p>并没有什么关系（手动滑稽）。</p>
 <p><a href="https://github.com/ReactiveCocoa/ReactiveCocoa" target="_blank" rel="external">ReactiveCocoa</a>是一个Cocoa的扩展框架，它是<a href="https://github.com/jspahrsummers" title="Justin Spahr-Summers" target="_blank" rel="external">Justin Spahr-Summers</a>和<a href="https://github.com/joshaber" target="_blank" rel="external">Josh Abernathy</a>在开发<a href="https://desktop.github.com/" target="_blank" rel="external">GitHub for Mac</a>的过程中的副产物。ReactiveCocoa受<code>Functional Reactive Programming(FRP)</code>的启发，但是最近他们提到也受到过Rx的启发。因此，可以说ReactiveCocoa是借鉴了一些Rx的精神，源自于FRP的一个框架。这两者是同一编程思想的两种不同实现。</p>
-<p>可以说，RxSwift和ReactiveCocoa是很神似的，它们都是函数式的、响应式的框架（但都不是真正意义上的<code>函数响应式</code>，后续文章会讲到）。但是又有一些不同点：</p>
+<p>RxSwift和ReactiveCocoa是很神似的，它们都是函数式的、响应式的框架（但都不是真正意义上的<code>函数响应式</code>，后续文章会讲到）。但是又有一些不同点：</p>
 <ul>
 <li>ReactiveCocoa是一个有4年历史的框架，经历了很多大型项目的实践运用</li>
-<li>RxSwift时间短一点。但是社区非常有活力。此外，由于RxSwift是Rx的正统家族成员，因此，在RxSwift、RxJava、RxJs等框架间迁移十分方便。可以说是「Learn once, apply everywhere」</li>
+<li>RxSwift时间短一点。但是社区非常有活力。另外，由于RxSwift是Rx的正统家族成员，因此，在RxSwift、RxJava、RxJs等框架间迁移十分方便，可以说是「Learn once, apply everywhere」</li>
 </ul>
 <p>此外，两者还有一些技术实现上的差别，这主要体现在他们是如何处理「副作用」的。关于副作用（Side-Effect），在后续的博文中会详细介绍，这里只需要理解成在创建一个可观察集合（ReactiveCocoa中为信号），以及对其进行观察时对该集合外部代码产生的影响：</p>
 <ul>
 <li>ReactiveCocoa中的核心概念是两种信号：<code>Signal</code>和<code>Signal Producer</code>，分别称为「冷信号」和「热信号」。ReactiveCocoa用这种概念的区分来处理副作用。</li>
 <li>RxSwift则只有一个核心概念：<code>Observable</code>。因此，在创建一个<code>Observable</code>时，要仔细考虑它应当是「冷信号」还是「热信号」。同样，这也是为了处理副作用。</li>
 </ul>
-<p>此外，尽管RxSwift和ReactiveCocoa对事件的定义都是类似的，都有三种类型的事件：</p>
+<p>另外，尽管RxSwift和ReactiveCocoa对事件的定义都是类似的，都有三种类型的事件：</p>
 <ul>
 <li><code>Next</code>：新产生的值</li>
 <li><code>Error</code>：发送一个错误值，并终止该可观察集合（信号），移除对它的观察者</li>
@@ -453,8 +453,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2017/08/15/ReactiveCocoa学习笔记（二）：函数响应式的世界/" rel="prev" title="ReactiveCocoa学习笔记（二）：函数响应式的世界">
-                ReactiveCocoa学习笔记（二）：函数响应式的世界 <i class="fa fa-chevron-right"></i>
+              <a href="/2017/08/15/ReactiveCocoa学习笔记（二）：函数响应式的世界/" rel="prev" title="ReactiveCocoa学习笔记（二）：函数式的世界">
+                ReactiveCocoa学习笔记（二）：函数式的世界 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
