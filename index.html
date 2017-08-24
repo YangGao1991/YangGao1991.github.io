@@ -381,42 +381,45 @@
 <blockquote>
 <p>函数式编程中，函数是一等公民。（Functions are first-class objects）</p>
 </blockquote>
-<p>怎么去理解这句话呢？我的理解是，<em>无论是函数式编程中的「函数是一等公民」，还是面向对象式编程中的「万物皆对象」，都是对事物的不同抽象方式</em>。</p>
+<p>怎么去理解这句话呢？我的理解是，无论是函数式编程中的「函数是一等公民」，还是面向对象式编程中的「万物皆对象」，都是对事物的不同抽象方式。</p>
 <p>在面向对象式的编程中，<code>类</code>和<code>对象</code>的概念深入人心。我们的类是「人」，阿猫阿狗的类是「宠物」，我们都有一个父类「动物」（这些话在每本面向对象语言的入门书籍中都会出现）。而<code>行为</code>必须依赖于<code>类</code>或<code>对象</code>，比如「吃东西」是「动物」的一个行为，所以子类「人」和「宠物」都会吃东西。寻找事物的共同点，并把它们归类，面向对象以这种抽象方式来描述这个世界。</p>
 <p>而函数式编程则换了一种思路：它是对<code>行为</code>的抽象。在函数式编程里，「吃东西」就是「吃东西」，输入一些食物，输出一些经过加工的结果（咳咳，这里就不具体说是什么了……），这是多么纯粹的一个行为。既然只涉及到对食物（数据）的处理这一行为，那为什么需要具体的类呢？类似的还有对「睡觉」，「打豆豆」……等等行为的抽象。这些对行为的抽象是函数式编程对这个世界的描述方式。</p>
 <p>既然是一等公民，那么自然地，函数式编程中，函数可以以参数、返回值的形式从一个函数传递到另一个函数，也就产生了高阶函数。这种传递本质上是对数据的流式处理。</p>
 <p>举个栗子，「计算一个数乘以3的结果」，这是一个相当纯粹的行为吧，我们很容易写出这样的函数：</p>
-<pre><code>[代码1]
+<pre><code>// 代码1
 - (NSNumber *)multipliedByThree:(NSNumber *)x {
     return @(x.integerValue * 3);
 }
 </code></pre><p>输入一个参数，输出一个结果，平平无奇的一个函数哈。但如果刚好有另外一个函数，它能够对一个集合里的所有元素进行一个操作，然后返回一个新集合：</p>
-<pre><code>[代码2]
+<pre><code>// 代码2
 @implement NSArray+SomeExcute
 
 - (NSArray *)map:(id (^)(id obj))block
 {
     NSMutableArray *result = [NSMutableArray arrayWithCapacity:self.count];
-&apos;&apos;     [self enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+    [self enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
         id value = block(obj) ?: [NSNull null];
         [result addObject:value];
     }];
     return result;
 }
 </code></pre><p>那么，我们就可以将<code>multipliedByThree</code>这个函数和<code>map</code>这个函数进行一次激情的碰撞：</p>
-<pre><code>[代码3]
+<pre><code>// 代码3
 [@[@(1), @(2), @(3), @(4)] map:^id(id x){
         return @(x.integerValue * 3);
 }]
 </code></pre><p>瞬间就将原来的数组变成了另外一个经过处理的数组了有木有。</p>
-<p>虽然代码很简单，但是还是可以分析一下：<code>multipliedByThree</code>函数是我们对一个处理数据的<code>行为</code>的抽象，<code>map</code>也是我们对一个处理数据（数组或其他集合）的<code>行为</code>的抽象，同时，<code>map</code>是一个高阶函数：它接受另一个函数作为参数。通过<code>multipliedByThree</code>和<code>map</code>的抽象，我们得以在<code>代码3</code>中，使用简明干练的语法和代码，完成对一个集合的复杂处理：<em>我们需要返回一个新数组，它的每一个元素值都是原数组中对应值的3倍</em>。</p>
-<p>注意上面的这句斜体字，这是很直观的一个「声明式」的语句。再回头看看上面的<code>代码3</code>，你会发现这段代码也充满了「声明式」的意味。我们在这里只是告诉计算机，我们「需要的」是什么，而不是去描述我们应当「怎么去做」（遍历集合中的每个元素，将该值乘以3，并添加到一个新的集合中，最后返回这个新的集合）。这正是函数式编程的魅力：它将原本的<code>命令式编程(Imperative)</code>变成了<code>声明式编程(Declarative)</code>，将「How to do 」变成了「What we want」，使得代码更加简洁明了和具有自注释性。然而我们也要记得，是<code>map</code>函数内部帮我们做了这些<code>Imperative</code>的工作。这正是对<code>行为</code>抽象的作用：寻找行为的共同点，并将它们抽象成函数，从而将「命令式」的「dirty work」封装在基础的函数中。</p>
+<p>虽然代码很简单，但是还是可以分析一下<a href="">an example</a>(<a href="http://example.com/" target="_blank" rel="external">http://example.com/</a> “Title”)：<code>multipliedByThree</code>函数是我们对一个处理数据的<code>行为</code>的抽象，<code>map</code>也是我们对一个处理数据（数组或其他集合）的<code>行为</code>的抽象，同时，<code>map</code>是一个高阶函数：它接受另一个函数作为参数。通过<code>multipliedByThree</code>和<code>map</code>的抽象，我们得以在<code>代码3</code>中，使用简明干练的语法和代码，完成对一个集合的复杂处理：<strong>我们需要返回一个新数组，它的每一个元素值都是原数组中对应值的3倍</strong>。</p>
+<p>注意上面最后一句话，这是很直观的一个「声明式」的语句。再回头看看上面的<code>代码3</code>，你会发现这段代码也充满了「声明式」的意味。我们在这里只是告诉计算机，我们「需要的」是什么，而不是去描述我们应当「怎么去做」（遍历集合中的每个元素，将该值乘以3，并添加到一个新的集合中，最后返回这个新的集合）。这正是函数式编程的魅力：它将原本的<code>命令式编程(Imperative)</code>变成了<code>声明式编程(Declarative)</code>，将「How to do 」变成了「What we want」，使得代码更加简洁明了和具有自注释性。然而我们也要记得，是<code>map</code>函数内部帮我们做了这些<code>Imperative</code>的工作。这正是对<code>行为</code>抽象的作用：寻找行为的共同点，并将它们抽象成函数，从而将「命令式」的「dirty work」封装在基础的函数中。</p>
 <p>对于上面这几段代码，还有两点想补充解释：</p>
 <ol>
 <li>Objective-C是一门面向对象的语言，对函数式编程的支持很弱。所以这里的<code>map</code>函数表现为<code>NSArray</code>的一个方法。但是，从本质上说，这个操作是普遍存在的，不依赖于这一个类的。</li>
-<li><code>map</code>函数的内部实现使用了循环。虽然在遍历一个集合的时候，使用循环是无可厚非的，但是函数式编程中的函数内部，应当是使用递归而不是循环。递归也是「自解释性」的，「声明式」的，而循环则是「命令式」的代码。更重要的是，循环是会使用到变量和状态，而这正是函数式编程想要消除的（下节会讲到）。</li>
+<li><code>map</code>函数的内部实现使用了循环。这里对于在函数式编程中遍历集合中的元素是否能使用循环我尚有疑问，但是函数式编程中的函数内部，应当是使用递归而不是循环。递归也是「自解释性」的，「声明式」的，而循环则是「命令式」的代码。更重要的是，循环是会使用到变量和状态，而这正是函数式编程想要消除的（下文会讲到）。</li>
 </ol>
-<h2 id="函数式编程中的函数"><a href="#函数式编程中的函数" class="headerlink" title="函数式编程中的函数"></a>函数式编程中的函数</h2><hr>
+<h2 id="为什么使用函数式编程"><a href="#为什么使用函数式编程" class="headerlink" title="为什么使用函数式编程"></a>为什么使用函数式编程</h2><blockquote>
+<p>In computer science, functional programming is a programming paradigm that treats computation as the evaluation of mathematical functions and avoids state and mutable data.</p>
+</blockquote>
+<hr>
 <h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="http://mp.weixin.qq.com/s/qqPg0JujBIUNQPQMxjjlZQ" target="_blank" rel="external">http://mp.weixin.qq.com/s/qqPg0JujBIUNQPQMxjjlZQ</a></p>
 
           
