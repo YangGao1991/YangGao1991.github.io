@@ -102,7 +102,7 @@
 <meta property="og:site_name" content="Sheep&#39;s Blog">
 <meta property="og:description" content="本文主要讲了我自己对函数式编程的理解。涉及到编程范式的方面，个人的理解不免有遗漏、不准确甚至错误的地方，希望能多多批评、交流、指正。  我们认识事物，总是要问一下「What」「Why」「How」。那么，ReactiveCocoa是什么呢？ 说到ReactiveCocoa，相信大部分看过介绍的人都会看到一句开场白：  ReactiveCocoa是一个函数式响应式的编程框架。  WTF，这个函数式响">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2017-08-30T15:34:02.000Z">
+<meta property="og:updated_time" content="2017-09-03T17:27:03.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ReactiveCocoa学习笔记（二）：函数式的世界">
 <meta name="twitter:description" content="本文主要讲了我自己对函数式编程的理解。涉及到编程范式的方面，个人的理解不免有遗漏、不准确甚至错误的地方，希望能多多批评、交流、指正。  我们认识事物，总是要问一下「What」「Why」「How」。那么，ReactiveCocoa是什么呢？ 说到ReactiveCocoa，相信大部分看过介绍的人都会看到一句开场白：  ReactiveCocoa是一个函数式响应式的编程框架。  WTF，这个函数式响">
@@ -392,19 +392,37 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">// 代码3</div><div class="line">[@[@(1), @(2), @(3), @(4)] map:^id(id x)&#123;</div><div class="line">	    return @(x.integerValue * 3);</div><div class="line">&#125;];</div></pre></td></tr></table></figure>
 <p>瞬间就将原来的数组变成了另外一个经过处理的数组了有木有。</p>
 <p>虽然代码很简单，但是还是可以分析一下：<code>multipliedByThree</code>函数是我们对一个处理数据的<code>行为</code>的抽象，<code>map</code>也是我们对一个处理数据（数组或其他集合）的<code>行为</code>的抽象，同时，<code>map</code>是一个高阶函数：它接受另一个函数作为参数。通过<code>multipliedByThree</code>和<code>map</code>的抽象，我们得以在<code>代码3</code>中，使用简明干练的语法和代码，完成对一个集合的复杂处理：<strong>我们需要返回一个新数组，它的每一个元素值都是原数组中对应值的3倍</strong>。</p>
-<p>注意上面最后一句话，这是很直观的一个「声明式」的语句。再回头看看上面的<code>代码3</code>，你会发现这段代码也充满了「声明式」的意味。我们在这里只是告诉计算机，我们「需要的」是什么，而不是去描述我们应当「怎么去做」（遍历集合中的每个元素，将该值乘以3，并添加到一个新的集合中，最后返回这个新的集合）。这正是函数式编程的魅力：它将原本的<code>命令式编程(Imperative)</code>变成了<code>声明式编程(Declarative)</code>，将「How to do 」变成了「What we want」，使得代码更加简洁明了和具有自注释性。然而我们也要记得，是<code>map</code>函数内部帮我们做了这些<code>Imperative</code>的工作。这正是对<code>行为</code>抽象的作用：寻找行为的共同点，并将它们抽象成函数，从而将「命令式」的「dirty work」封装在基础的函数中。</p>
+<p>注意上面最后一句话，这是很直观的一个「声明式」的语句。再回头看看上面的<code>代码3</code>，你会发现这段代码也充满了「声明式」的意味。我们在这里只是告诉计算机，我们「需要的」是什么，而不是去描述我们应当「怎么去做」（遍历集合中的每个元素，将该值乘以3，并添加到一个新的集合中，最后返回这个新的集合）。</p>
+<p>这正是函数式编程的魅力：它将原本的<code>命令式编程(Imperative)</code>变成了<code>声明式编程(Declarative)</code>，将「How to do 」变成了「What we want」，将思考「如何把这个问题用代码实现」转变成了「如何用代码去描述这个问题」，从而使得代码更加简洁明了和具有自注释性。诸如<code>map</code>的函数正是对<code>行为</code>的抽象，而通过抽象出若干个更小的、更通用的<code>行为</code>，将细节（如iteration）隐藏在了抽象中，我们外部的代码也就具有了「声明式」的性质。</p>
 <p>对于上面这几段代码，还有两点想补充解释：</p>
 <ol>
 <li>Objective-C是一门面向对象的语言，对函数式编程的支持很弱。所以这里的<code>map</code>函数表现为<code>NSArray</code>的一个方法。但是，从本质上说，这个操作是普遍存在的，不依赖于这一个类的。</li>
 <li><code>map</code>函数的内部实现使用了循环。这里对于在函数式编程中遍历集合中的元素是否能使用循环我尚有疑问，但是函数式编程中的函数内部，应当是使用递归而不是循环。递归也是「自解释性」的，「声明式」的，而循环则是「命令式」的代码。更重要的是，循环是会使用到变量和状态，而这正是函数式编程想要消除的（下文会讲到）。</li>
 </ol>
-<h2 id="为什么使用函数式编程"><a href="#为什么使用函数式编程" class="headerlink" title="为什么使用函数式编程"></a>为什么使用函数式编程</h2><blockquote>
+<h2 id="「一等公民」许可证"><a href="#「一等公民」许可证" class="headerlink" title="「一等公民」许可证"></a>「一等公民」许可证</h2><blockquote>
 <p>In computer science, functional programming is a programming paradigm that treats computation as the evaluation of mathematical functions and avoids changing-state and mutable data. – wiki</p>
 </blockquote>
-<p>以上这段话是wiki中函数式编程的定义。由此我们也可以看出，函数式编程主要想消灭的是两个东西：状态(changing-state)和变量(mutable data)。</p>
+<p>以上这段话是wiki中函数式编程的定义。在这段话中，有两个地方值得注意：</p>
+<p>首先，<code>mathematical functions</code>，即数学意义上的函数意味着什么呢？它意味着一个函数要想成为函数式编程中的一等公民，可是有门槛的——它必须是<code>纯函数(pure function)</code>。</p>
+<p>来看这样一段代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">// 代码4</div><div class="line">@implement ClassA</div><div class="line"></div><div class="line">@property (readwrite) NSInteger count;</div><div class="line"></div><div class="line">- (NSInteger)doAdd:(NSInteger)x &#123;</div><div class="line">	return self.count + x;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>其中的doAdd函数的返回值，毫无疑问是依赖于外部的变量count的。当count的值发生变化时，即使入参x的值不变，该函数也会返回一个完全不同的值。而这是纯函数绝不容许发生的：在数学上，一个函数的返回值是完全取决于输入的参数的，即对于相同的参数，必然会产生相同的结果。这就是纯函数所必须的第一个要求——确定性。</p>
+<p>其次，<code>avoids changing-state and mutable data</code>说的则是“一等公民”的另一个重要的特点——纯函数必须不能产生<code>副作用</code>。<code>副作用</code>是指一个函数在运行过程中对函数外部世界的影响，比如修改外部的变量(changing-state)，改变可变数据(mutable data)，或者进行io操作等等。此外，由于「循环」操作需要依靠循环变量作为中间值，所以在纯函数中，循环也是不被允许的，其可被「递归」代替。而递归所产生的调用栈太深的问题，可以由「尾递归优化」解决，这里不多深入探讨了。</p>
+<p>一句话总结，纯函数必须只完成自己的工作，对外部世界一无所知，既不依赖于外部世界，也不会对外部世界产生影响。</p>
+<h2 id="函数式编程中「状态」的传递"><a href="#函数式编程中「状态」的传递" class="headerlink" title="函数式编程中「状态」的传递"></a>函数式编程中「状态」的传递</h2><p>在<code>命令式编程</code>中，状态和变量算是不能再常见的东西了。当我们需要一步步编写一条条命令的时候，必须得有临时变量或者全局变量来保存上一步的操作结果或者状态，以便下一步的命令使用。最常见的就是「赋值」操作了：我们将一个中间的数据或状态赋值给一个变量，然后在以后的某个时刻去使用它。而「状态」和「副作用」也确实是一个真正的工程项目所不可或缺的，真的会有工程项目不需要进行io操作吗？但是像上文所说的，如果函数式编程中的函数必须是<code>纯函数</code>的话，该怎么处理这些呢？</p>
+<p>函数式编程并不是完全抛弃了它们，只不过，函数式编程是通过参数的传递来完成这一切的。将「状态」（即「上下文」）和「副作用」包裹在参数中，在真正核心的数据传递的时候，将这些必不可少的信息同时打包传递下去，这样就可以在保证函数的纯洁性的同时，保存数据处理所必需的上下文信息。这就好比将真正需要处理的数据和必要的上下文信息，副作用等封装在了一个盒子里，然后让它在一个个纯函数的“管道”中流通、处理，不需要中间变量，也不需要全局状态。数据就这样“脚不沾地”地一步步变成了我们最终需要的模样。</p>
+<p>但是，wait！想象一下，如果各个“管道”口径不一样大，对于盒子的大小要求也不一样，那就要求我们封装盒子的时候需要不同的规格；此外，如果在每个管道里都要进行打开盒子–&gt;取出核心的数据–&gt;处理–&gt;然后再连同原来的「副作用」等等一起封装成一个新的盒子–&gt;传递出去这样一个流程的话，那么也太繁琐了点。其实，这些都是函数式编程中另一个重要的概念——<code>monad</code>所要解决的事情。</p>
+<p><code>monad</code>的概念google一下可谓千人千面，众说纷纭。在这里，我觉得可以将其理解为函数式编程中一个在函数间约定好的数据结构。用Objective-C的语言来说，它是一个实现了<code>monad protocol</code>的数据类型。<code>monad protocol</code>定义了如下两个接口函数：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">(BoxValue)return:(value)value;</div><div class="line">(BoxValue)bind:(value-&gt;BoxValue)f;</div></pre></td></tr></table></figure>
+<p>其中，<code>return</code>函数解决的是“如何封装”的问题：接收一个值类型的数据，返回一个“盒子”类型的数据（封装后的值）；<code>bind</code>函数（也被称为&gt;&gt;=）解决的是“如何传递”的问题：接收一个「接收值类型数据，返回盒子类型数据」的函数，返回一个值类型。</p>
+<p>（注：这里只是简单说明了<code>monad</code>的概念，其实<code>monad</code>是一个派生的协议，其父协议还有<code>Functor</code>和<code>Applicative</code>，感兴趣的可以深入阅读参考资料中的相关内容）</p>
+<p>实现了上述两个接口函数的数据结构就是<code>monad</code>。根据其中封装的「副作用」的不同，产生了各种各样的<code>monad</code>，比如<code>Maybe</code>或者<code>io monad</code>；而<code>bind</code>函数则实现了</p>
 <hr>
 <h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="http://mp.weixin.qq.com/s/qqPg0JujBIUNQPQMxjjlZQ" target="_blank" rel="external">javascript王国之函数教主</a></p>
 <p><a href="https://en.wikipedia.org/wiki/Functional_programming" target="_blank" rel="external">Wikipedia: Functional Programming</a></p>
+<p><a href="http://www.cs.utexas.edu/~shmat/courses/cs345/whyfp.pdf" target="_blank" rel="external">Why Functional Programming Matters</a></p>
+<p><a href="https://www.ibm.com/developerworks/java/library/j-ft20/index.html" target="_blank" rel="external">Functional Thinking: Why functional programming is on the rise</a></p>
+<p><a href="https://medium.com/@chetcorcos/functional-programming-for-javascript-people-1915d8775504" target="_blank" rel="external">Functional Programming for JavaScript People</a></p>
 
       
     </div>
@@ -603,7 +621,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#函数式编程是什么"><span class="nav-number">1.</span> <span class="nav-text">函数式编程是什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#为什么使用函数式编程"><span class="nav-number">2.</span> <span class="nav-text">为什么使用函数式编程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-number">3.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#函数式编程是什么"><span class="nav-number">1.</span> <span class="nav-text">函数式编程是什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#「一等公民」许可证"><span class="nav-number">2.</span> <span class="nav-text">「一等公民」许可证</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#函数式编程中「状态」的传递"><span class="nav-number">3.</span> <span class="nav-text">函数式编程中「状态」的传递</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-number">4.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
             
 
           </div>
