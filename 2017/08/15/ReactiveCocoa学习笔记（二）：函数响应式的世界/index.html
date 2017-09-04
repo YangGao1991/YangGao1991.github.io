@@ -102,7 +102,7 @@
 <meta property="og:site_name" content="Sheep&#39;s Blog">
 <meta property="og:description" content="本文主要讲了我自己对函数式编程的理解。涉及到编程范式的方面，个人的理解不免有遗漏、不准确甚至错误的地方，希望能多多批评、交流、指正。  我们认识事物，总是要问一下「What」「Why」「How」。那么，ReactiveCocoa是什么呢？ 说到ReactiveCocoa，相信大部分看过介绍的人都会看到一句开场白：  ReactiveCocoa是一个函数式响应式的编程框架。  WTF，这个函数式响">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2017-09-04T12:11:46.000Z">
+<meta property="og:updated_time" content="2017-09-04T15:12:20.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ReactiveCocoa学习笔记（二）：函数式的世界">
 <meta name="twitter:description" content="本文主要讲了我自己对函数式编程的理解。涉及到编程范式的方面，个人的理解不免有遗漏、不准确甚至错误的地方，希望能多多批评、交流、指正。  我们认识事物，总是要问一下「What」「Why」「How」。那么，ReactiveCocoa是什么呢？ 说到ReactiveCocoa，相信大部分看过介绍的人都会看到一句开场白：  ReactiveCocoa是一个函数式响应式的编程框架。  WTF，这个函数式响">
@@ -382,7 +382,7 @@
 </blockquote>
 <p>怎么去理解这句话呢？我的理解是，无论是函数式编程中的「函数是一等公民」，还是面向对象式编程中的「万物皆对象」，都是对事物的不同抽象方式。</p>
 <p>在面向对象式的编程中，<code>类</code>和<code>对象</code>的概念深入人心。我们的类是「人」，阿猫阿狗的类是「宠物」，我们都有一个父类「动物」（这些话在每本面向对象语言的入门书籍中都会出现）。而<code>行为</code>必须依赖于<code>类</code>或<code>对象</code>，比如「吃东西」是「动物」的一个行为，所以子类「人」和「宠物」都会吃东西。寻找事物的共同点，并把它们归类，面向对象以这种抽象方式来描述这个世界。</p>
-<p>而函数式编程则换了一种思路：它是对<code>行为</code>的抽象。在函数式编程里，「吃东西」就是「吃东西」，输入一些食物，输出一些经过加工的结果（咳咳，这里就不具体说是什么了……），这是多么纯粹的一个行为。既然只涉及到对食物（数据）的处理这一行为，那为什么需要具体的类呢？类似的还有对「睡觉」，「打豆豆」……等等行为的抽象。这些对行为的抽象是函数式编程对这个世界的描述方式。</p>
+<p>而函数式编程则换了一种思路：它是对「行为」的抽象。在函数式编程里，「吃东西」就是「吃东西」，输入一些食物，输出一些经过加工的结果（咳咳，这里就不具体说是什么了……），这是多么纯粹的一个行为。既然只涉及到对食物（数据）的处理这一行为，那为什么需要具体的类呢？类似的还有对「睡觉」，「打豆豆」……等等行为的抽象。这些对行为的抽象是函数式编程对这个世界的描述方式。</p>
 <p>既然是一等公民，那么自然地，函数式编程中，函数可以以参数、返回值的形式从一个函数传递到另一个函数，也就产生了高阶函数。这种传递本质上是对数据的流式处理。</p>
 <p>举个栗子，「计算一个数乘以3的结果」，这是一个相当纯粹的行为吧，我们很容易写出这样的函数：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">// 代码1</div><div class="line">- (NSNumber *)multipliedByThree:(NSNumber *)x &#123;</div><div class="line">	return @(x.integerValue * 3);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
@@ -391,9 +391,9 @@
 <p>那么，我们就可以将<code>multipliedByThree</code>这个函数和<code>map</code>这个函数进行一次激情的碰撞：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">// 代码3</div><div class="line">[@[@(1), @(2), @(3), @(4)] map:^id(id x)&#123;</div><div class="line">	    return @(x.integerValue * 3);</div><div class="line">&#125;];</div></pre></td></tr></table></figure>
 <p>瞬间就将原来的数组变成了另外一个经过处理的数组了有木有。</p>
-<p>虽然代码很简单，但是还是可以分析一下：<code>multipliedByThree</code>函数是我们对一个处理数据的<code>行为</code>的抽象，<code>map</code>也是我们对一个处理数据（数组或其他集合）的<code>行为</code>的抽象，同时，<code>map</code>是一个高阶函数：它接受另一个函数作为参数。通过<code>multipliedByThree</code>和<code>map</code>的抽象，我们得以在<code>代码3</code>中，使用简明干练的语法和代码，完成对一个集合的复杂处理：<strong>我们需要返回一个新数组，它的每一个元素值都是原数组中对应值的3倍</strong>。</p>
+<p>虽然代码很简单，但是还是可以分析一下：<code>multipliedByThree</code>函数是我们对一个处理数据的「行为」的抽象，<code>map</code>也是我们对一个处理数据（数组或其他集合）的「行为」的抽象，同时，<code>map</code>是一个高阶函数：它接受另一个函数作为参数。通过<code>multipliedByThree</code>和<code>map</code>的抽象，我们得以在<code>代码3</code>中，使用简明干练的语法和代码，完成对一个集合的复杂处理：<strong>我们需要返回一个新数组，它的每一个元素值都是原数组中对应值的3倍</strong>。</p>
 <p>注意上面最后一句话，这是很直观的一个「声明式」的语句。再回头看看上面的<code>代码3</code>，你会发现这段代码也充满了「声明式」的意味。我们在这里只是告诉计算机，我们「需要的」是什么，而不是去描述我们应当「怎么去做」（遍历集合中的每个元素，将该值乘以3，并添加到一个新的集合中，最后返回这个新的集合）。</p>
-<p>这正是函数式编程的魅力之一：它将原本的<code>命令式编程(Imperative)</code>变成了<code>声明式编程(Declarative)</code>，将「How to do」变成了「What we want」，将思考「如何把这个问题用代码实现」转变成了「如何用代码去描述这个问题」，从而使得代码更加简洁明了和具有自注释性。诸如<code>map</code>的函数正是对<code>行为</code>的抽象，而通过抽象出若干个更小的、更通用的<code>行为</code>，将细节（如iteration）隐藏在了抽象中，我们外部的代码也就具有了「声明式」的性质。</p>
+<p>这正是函数式编程的魅力之一：它将原本的<code>命令式编程(Imperative)</code>变成了<code>声明式编程(Declarative)</code>，将「How to do」变成了「What we want」，将思考「如何把这个问题用代码实现」转变成了「如何用代码去描述这个问题」，从而使得代码更加简洁明了和具有自注释性。诸如<code>map</code>的函数正是对「行为」的抽象，而通过抽象出若干个更小的、更通用的<code>行为</code>，将细节（如iteration）隐藏在了抽象中，我们外部的代码也就具有了「声明式」的性质。</p>
 <p>对于上面这几段代码，还有两点想补充解释：</p>
 <ol>
 <li>这里的<code>map</code>函数表现为<code>NSArray</code>的一个方法。但是，从本质上说，这个操作是可以普遍存在的，不依赖于这一个类。下文对此会有更详细的描述。</li>
@@ -403,16 +403,16 @@
 <p>In computer science, functional programming is a programming paradigm that treats computation as the evaluation of mathematical functions and avoids changing-state and mutable data. – wiki</p>
 </blockquote>
 <p>以上这段话是wiki中函数式编程的定义。在这段话中，有两个地方值得注意：</p>
-<p>首先，<code>mathematical functions</code>，即数学意义上的函数意味着什么呢？它意味着一个函数要想成为函数式编程中的一等公民，可是有门槛的——它必须是<code>纯函数(pure function)</code>。</p>
+<p>首先，「mathematical functions」，即数学意义上的函数意味着什么呢？它意味着一个函数要想成为函数式编程中的一等公民，可是有门槛的——它必须是<code>纯函数(pure function)</code>。</p>
 <p>来看这样一段代码：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">// 代码4</div><div class="line">@implement ClassA</div><div class="line"></div><div class="line">@property (readwrite) NSInteger count;</div><div class="line"></div><div class="line">- (NSInteger)doAdd:(NSInteger)x &#123;</div><div class="line">	return self.count + x;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>其中的doAdd函数的返回值，毫无疑问是依赖于外部的变量count的。当count的值发生变化时，即使入参x的值不变，该函数也会返回一个完全不同的值。而这是纯函数绝不容许发生的：在数学上，一个函数的返回值是完全取决于输入的参数的，即对于相同的参数，必然会产生相同的结果。这就是纯函数所必须的第一个要求——确定性。</p>
-<p>其次，<code>avoids changing-state and mutable data</code>说的则是“一等公民”的另一个重要的特点——纯函数必须不能产生<code>副作用</code>。<code>副作用</code>是指一个函数在运行过程中对函数外部世界的影响，比如修改外部的变量(changing-state)，改变可变数据(mutable data)，或者进行io操作等等。此外，由于「循环」操作需要依靠循环变量作为中间值，所以在纯函数中，循环也是不被允许的，其可被「递归」代替。而递归所产生的调用栈太深的问题，可以由「尾递归优化」解决，这里不多深入探讨了。</p>
+<p>其中的<code>doAdd</code>函数的返回值，毫无疑问是依赖于外部的变量<code>count</code>的。当<code>count</code>的值发生变化时，即使入参<code>x</code>的值不变，该函数也会返回一个完全不同的值。而这是纯函数绝不容许发生的：在数学上，一个函数的返回值是完全取决于输入的参数的，即对于相同的参数，必然会产生相同的结果。这就是纯函数所必须的第一个要求——确定性。</p>
+<p>其次，「avoids changing-state and mutable data」说的则是“一等公民”的另一个重要的特点——纯函数必须不能产生<code>副作用</code>。<code>副作用</code>是指一个函数在运行过程中对函数外部世界的影响，比如修改外部的变量(changing-state)，改变可变数据(mutable data)，或者进行io操作等等。此外，由于「循环」操作需要依靠循环变量作为中间值，所以在纯函数中，循环也是不被允许的，其可被「递归」代替。而递归所产生的调用栈太深的问题，可以由「尾递归优化」解决，这里不多深入探讨了。</p>
 <p>一句话总结，纯函数必须只完成自己的工作，对外部世界一无所知，既不依赖于外部世界，也不会对外部世界产生影响。</p>
 <h2 id="函数式编程中的「状态」和「副作用」"><a href="#函数式编程中的「状态」和「副作用」" class="headerlink" title="函数式编程中的「状态」和「副作用」"></a>函数式编程中的「状态」和「副作用」</h2><p>在<code>命令式编程</code>中，状态和变量算是不能再常见的东西了。当我们需要一步步编写一条条命令的时候，必须得有临时变量或者全局变量来保存上一步的操作结果或者状态，以便下一步的命令使用。最常见的就是「赋值」操作了：我们将一个中间的数据或状态赋值给一个变量，然后在以后的某个时刻去使用它。而「状态」和「副作用」也确实是一个真正的工程项目所不可或缺的，真的会有工程项目不需要进行io操作吗？但是像上文所说的，如果函数式编程中的函数必须是<code>纯函数</code>的话，该怎么处理这些呢？</p>
 <p>函数式编程并不是完全抛弃了它们，只不过，函数式编程是通过参数的传递来完成这一切的。将「状态」（即「上下文」）和「副作用」包裹在参数中，在真正核心的数据传递的时候，将这些必不可少的信息同时打包传递下去，这样就可以在保证函数的纯洁性的同时，保存数据处理所必需的上下文信息。这就好比将真正需要处理的数据和必要的上下文信息，副作用等封装在了一个盒子里，然后让它在一个个纯函数的“管道”中流通、处理，不需要中间变量，也不需要全局状态。数据就这样“脚不沾地”地一步步变成了我们最终需要的模样。</p>
 <p>但是，wait！想象一下，如果各个“管道”所进行的操作不一样：有的仅仅会返回一个值类型，有的会将参数的盒子打开，处理之后再返回一个新的“盒子”类型……此外，如果在每个管道里都要进行打开盒子–&gt;取出核心的数据–&gt;处理–&gt;然后再连同原来的「副作用」等等一起封装成一个新的盒子–&gt;传递出去这样一个流程的话，那么也太繁琐了点。其实，这些都是函数式编程中另一个重要的概念——<code>monad</code>所要解决的事情。</p>
-<p><code>monad</code>的概念google一下可谓千人千面，众说纷纭。在这里，我觉得可以将其理解为函数式编程中一个在函数间约定好的数据类型。用Objective-C的语言来说，它是一个实现了<code>monad protocol</code>的“盒子”类型。<code>monad protocol</code>定义了如下两个接口函数：</p>
+<p><code>monad</code>的概念google一下可谓众说纷纭。在这里，我觉得可以将其理解为函数式编程中一个在函数间约定好的数据类型。用Objective-C的语言来说，它是一个实现了<code>monad protocol</code>的“盒子”类型。<code>monad protocol</code>定义了如下两个接口函数：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">-(BoxValue)return:(Value)value;</div><div class="line">-(BoxValue)bind:(Value-&gt;BoxValue)f;</div></pre></td></tr></table></figure>
 <p>而且，<code>monad protocol</code>是一个派生接口，其派生关系为<code>Functor-&gt;Applicative-&gt;Monad</code>，因此，可以认为<code>monad protocol</code>中还继承了下列两个接口函数：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">// 继承自Functor Protocol</div><div class="line">-(BoxValue)map:(Value-&gt;Value)f;</div><div class="line"></div><div class="line">// 继承自Applicative Protocol </div><div class="line">-(BoxValue)applied:(BoxValue(Value-&gt;Value)f); //applied也被称为&lt;*&gt;</div></pre></td></tr></table></figure>
