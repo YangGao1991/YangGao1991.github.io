@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="ReactiveCocoa,iOS," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="上一篇谈了谈我自己对函数式编程的理解。这篇文章会讲到，函数响应式编程到底是个啥。  响应式编程输入和输出对于响应式编程，我没有找到比这篇文章更为生动详尽的文章了，因此这里大部分是翻译自原文，加上了一些我自己的思考。 本质上来说，我们构建应用时，都是在做一件事情：等待一些事件的发生，来提供一些信息作为输入。我们根据这些输入的信息，进行某些处理，生成特定的结果并输出。 输入可以是多种多样的：「用户点">
+<meta name="keywords" content="ReactiveCocoa,iOS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ReactiveCocoa学习笔记（三）：响应式和函数响应式编程">
+<meta property="og:url" content="http://yoursite.com/2017/09/16/ReactiveCocoa学习笔记（三）：响应式和函数响应式编程/index.html">
+<meta property="og:site_name" content="Sheep&#39;s Blog">
+<meta property="og:description" content="上一篇谈了谈我自己对函数式编程的理解。这篇文章会讲到，函数响应式编程到底是个啥。  响应式编程输入和输出对于响应式编程，我没有找到比这篇文章更为生动详尽的文章了，因此这里大部分是翻译自原文，加上了一些我自己的思考。 本质上来说，我们构建应用时，都是在做一件事情：等待一些事件的发生，来提供一些信息作为输入。我们根据这些输入的信息，进行某些处理，生成特定的结果并输出。 输入可以是多种多样的：「用户点">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://www.sprynthesis.com/assets/images/code-timeline.png">
+<meta property="og:image" content="http://www.sprynthesis.com/assets/images/events.png">
+<meta property="og:image" content="http://www.sprynthesis.com/assets/images/state-change.png">
+<meta property="og:image" content="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1505585974098&di=14500d713bca3617e3177ca4088eecb1&imgtype=jpg&src=http%3A%2F%2Fimg0.imgtn.bdimg.com%2Fit%2Fu%3D3109653125%2C4251890918%26fm%3D214%26gp%3D0.jpg">
+<meta property="og:updated_time" content="2017-09-16T16:13:16.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ReactiveCocoa学习笔记（三）：响应式和函数响应式编程">
+<meta name="twitter:description" content="上一篇谈了谈我自己对函数式编程的理解。这篇文章会讲到，函数响应式编程到底是个啥。  响应式编程输入和输出对于响应式编程，我没有找到比这篇文章更为生动详尽的文章了，因此这里大部分是翻译自原文，加上了一些我自己的思考。 本质上来说，我们构建应用时，都是在做一件事情：等待一些事件的发生，来提供一些信息作为输入。我们根据这些输入的信息，进行某些处理，生成特定的结果并输出。 输入可以是多种多样的：「用户点">
+<meta name="twitter:image" content="http://www.sprynthesis.com/assets/images/code-timeline.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/09/16/ReactiveCocoa学习笔记（三）：响应式和函数响应式编程/"/>
+
+
+
+
+
+  <title>ReactiveCocoa学习笔记（三）：响应式和函数响应式编程 | Sheep's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Sheep's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">In This Life We Believe</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/09/16/ReactiveCocoa学习笔记（三）：响应式和函数响应式编程/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Sheep">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Sheep's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">ReactiveCocoa学习笔记（三）：响应式和函数响应式编程</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-09-16T23:14:21+08:00">
+                2017-09-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Blog/" itemprop="url" rel="index">
+                    <span itemprop="name">Blog</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2017/09/16/ReactiveCocoa学习笔记（三）：响应式和函数响应式编程/" class="leancloud_visitors" data-flag-title="ReactiveCocoa学习笔记（三）：响应式和函数响应式编程">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                  <span class="post-meta-divider">|</span>
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计</span>
+                
+                <span title="字数统计">
+                  2,195
+                </span>
+              
+
+              
+
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>上一篇谈了谈我自己对函数式编程的理解。这篇文章会讲到，函数响应式编程到底是个啥。</p>
+</blockquote>
+<h2 id="响应式编程"><a href="#响应式编程" class="headerlink" title="响应式编程"></a>响应式编程</h2><h3 id="输入和输出"><a href="#输入和输出" class="headerlink" title="输入和输出"></a>输入和输出</h3><p>对于响应式编程，我没有找到比<a href="http://www.sprynthesis.com/2014/06/15/why-reactivecocoa/" target="_blank" rel="external">这篇文章</a>更为生动详尽的文章了，因此这里大部分是翻译自原文，加上了一些我自己的思考。</p>
+<p>本质上来说，我们构建应用时，都是在做一件事情：等待一些事件的发生，来提供一些信息作为输入。我们根据这些输入的信息，进行某些处理，生成特定的结果并输出。</p>
+<p>输入可以是多种多样的：「用户点击了一个按钮」是一种输入；「服务器有数据返回了」是一种输入；某个方法的回调是一种输入；或者某个对象的某个属性的变化也可以是一种输入。看着很眼熟哈，我们每天都在和这些输入打交道：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">///</div><div class="line">// delegate</div><div class="line">- (void) tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath &#123;</div><div class="line">&#125;</div><div class="line"></div><div class="line">// block based callbacks</div><div class="line">[TCAPI getCategoriesOnComplete:^(NSArray *objects, HTTPOperation *operation, NSError *error) &#123;</div><div class="line">&#125;];</div><div class="line"></div><div class="line">// target action</div><div class="line">- (IBAction)buttonAction:(id)sender &#123;</div><div class="line">&#125;</div><div class="line"></div><div class="line">// timers</div><div class="line">[NSTimer scheduledTimerWithTimeInterval:.1 target:self </div><div class="line">                               selector:@selector(spinIt:) userInfo:nil repeats:YES];</div><div class="line">                               </div><div class="line">// KVO</div><div class="line">- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object </div><div class="line">                        change:(NSDictionary *)change context:(void *)context &#123;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这些都是Objective-C提供的通信机制，来给我们传达一些输入信息：某个事件发生了，怎么处理你看着办吧。（题外话：objc.io的<a href="https://www.objc.io/issues/7-foundation/communication-patterns/" target="_blank" rel="external">这篇文章</a>对于这些通信机制讲的很好）</p>
+<p>而我们的输出也是各种各样的：我们可以将一些信息保存在本地；或者我们可以通过网络协议将一些信息保存在服务器上；当然，对于移动端app来说，我们最主要的输出，还是根据情况去更新UI界面，以便展示新的信息给用户。</p>
+<h3 id="线性编程-Linear-Programming"><a href="#线性编程-Linear-Programming" class="headerlink" title="线性编程(Linear Programming)"></a>线性编程(Linear Programming)</h3><p>然而，麻烦的事情来了：我们的每个输出，几乎不会只和一个输入相关：当收到一个用户点击事件的输入时，我们需要更新一个UI界面，但是界面的更新往往也依赖于服务器的数据返回，或是之前用户的其他操作；更麻烦的是，我们的输入和输出是异步的：我们的输出和输入在时间顺序上是分离的。</p>
+<p>造成这个麻烦的原因是：我们传统的编程处理输入和输出的方式是<code>线性的(Linear Programming)</code>，比如下面这段代码：</p>
+<p><img src="http://www.sprynthesis.com/assets/images/code-timeline.png" alt=""><br>可以看到，我们的每段代码在时间顺序上都是一段彼此独立的的时间范围。即使是异步的操作，比如各种<code>callback</code>，也不过是让我们在时间轴中间插入一段代码去执行。（这里没有说到多线程。然而即使是多线程，也只是在另一个线程上开辟了一条新的时间轴，开始一段新的线性编程的故事……）</p>
+<p>现在让我们来看看上面说的麻烦事儿吧——当我们接收到某个输入事件的时候，我们往往需要作出相应的输出，这个输出往往不仅取决于当前的输入，而且是和时间轴上处于前面的输入造成的结果相关的：</p>
+<blockquote>
+<p>哎呀用户点击这个「菜单」按钮了，这个时候应当展示出下拉菜单了。但是，首先要确认的是，用户当前是否已经登录了呢？这个菜单所需要的数据是否已经从服务器拿到了呢？用户之前点过这个按钮了么？现在是应当展示这个菜单还是收起这个菜单呢？……</p>
+</blockquote>
+<p>相信我们对这样的逻辑也是再熟悉不过了，我们每天都在这样写代码（手动滑稽）。我们的程序像个傻瓜金鱼，只有7秒钟的记忆。这样说太夸张了，其实我们的程序连1毫秒的记忆也没有:）。我们只好在有输入到来的时候，回过头再去check一遍之前时间轴上发生的事情，检查一些必要的信息，然后做出输出。</p>
+<p><img src="http://www.sprynthesis.com/assets/images/events.png" alt=""><br>好，回忆一下我们是怎么去做到的呢？用什么去追踪时间轴上前面发生的故事的呢？我们也很无奈啊，我们只好引入了一个又一个的<strong>「状态」</strong>。</p>
+<h3 id="状态（State）"><a href="#状态（State）" class="headerlink" title="状态（State）"></a>状态（State）</h3><p>什么是「状态」？「状态」是程序运行中的参数的记录，是程序“现在长啥样”的描述。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">@property (nonatomic, assign) BOOL userIsLoggedIn;</div><div class="line">@property (nonatomic, assign) BOOL menuDataIsLoaded;</div><div class="line">@property (nonatomic, assign) BOOL isMenuShowing;</div><div class="line">...</div></pre></td></tr></table></figure>
+<p>这些是为了解决上面那个恼人的问题所需要记录的状态。当时间轴上有事件发生的时候，我们去更新这些状态；如果某个输出需要用到这些信息，我们再去检查这些<code>property</code>当前的值。我们手动去追踪程序的状态，在各个必要的地方去更新它们，然后在一个名为<code>xxxUpdate</code>的方法中，写一些复杂的判断逻辑来根据这些状态给出我们的输出：</p>
+<p><img src="http://www.sprynthesis.com/assets/images/state-change.png" alt=""></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div></pre></td><td class="code"><pre><div class="line">// a central function that checks all our states and generates the appropriate output</div><div class="line">- (void) checkAndUpdateMenuStatus &#123;</div><div class="line">    if (self.menuShouldBeShowing &amp;&amp; !self.isMenuShowing </div><div class="line">        &amp;&amp; self.menuDataIsLoaded &amp;&amp; self.userIsLoggedIn) &#123;</div><div class="line">        [self showMenu];</div><div class="line">    &#125; else if (!self.menuShouldBeShowing &amp;&amp; self.isMenuShowing) &#123;</div><div class="line">        [self hideMenu];</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">// sets initial states and sets up our notification observation</div><div class="line">- (void) viewDidLoad &#123;</div><div class="line">    // Set initial states</div><div class="line">    // Let&apos;s assume you can&apos;t get to this page without being logged in</div><div class="line">    self.userIsLoggedIn = YES;</div><div class="line">    self.isMenuShowing = NO;</div><div class="line">    self.menuDataIsLoaded = NO;</div><div class="line">    self.menuShouldBeShowing = NO;</div><div class="line">    // Need to handle in case the user logs out while on this page</div><div class="line">    [[NSNotificationCenter defaultCenter] addObserverForName:kUserLoggedOutNotification </div><div class="line">                                                      object:nil </div><div class="line">                                                       queue:nil </div><div class="line">                                                  usingBlock:^(NSNotification *note) &#123;</div><div class="line">        self.userIsLoggedIn = NO;</div><div class="line">        [self checkAndUpdateMenuStatus];</div><div class="line">    &#125;];</div><div class="line">    // set the initial state (somewhat unnecessary since our menu starts hidden</div><div class="line">    // but a good safety check)</div><div class="line">    [self checkAndUpdateMenuStatus];</div><div class="line">&#125;</div><div class="line"></div><div class="line">// Loads the menu data from the network</div><div class="line">- (void) loadMenuData &#123;</div><div class="line">    [TCPAPI fetchUserMenuData onComplete:^(NSArray *objects, NSError *error) &#123;</div><div class="line">        [self hideLoadingView];</div><div class="line">        if(!error) &#123;</div><div class="line">            self.menuDataIsLoaded = YES;</div><div class="line">            [self checkAndUpdateMenuStatus];</div><div class="line">        &#125;</div><div class="line">    &#125;];</div><div class="line">&#125;</div><div class="line"></div><div class="line">// handles showing and hiding a loading view</div><div class="line">- (void) startLoadingView &#123;</div><div class="line">    if(self.isLoadingShowing) return;</div><div class="line">    self.isLoadingShowing = YES;</div><div class="line">    // do work to show loading view</div><div class="line">&#125;</div><div class="line">- (void) hideLoadingView &#123;</div><div class="line">    if(!self.isLoadingShowing) return;</div><div class="line">    self.isLoadingShowing = NO;</div><div class="line">    // do work to hide loading view</div><div class="line">&#125;</div><div class="line">- (void) showMenu &#123;</div><div class="line">    // show menu</div><div class="line">    self.isMenuShowing = YES;</div><div class="line">&#125;</div><div class="line">- (void) hideMenu &#123;</div><div class="line">    // hide menu</div><div class="line">    self.isMenuShowing = NO;</div><div class="line">&#125;</div><div class="line">- (IBAction) userTappedMenuButton:(UIButton *menuButton) &#123;</div><div class="line">    // kick off loading of our menu data lazily if it isn&apos;t loaded yet</div><div class="line">    if(!self.menuDataIsLoaded) &#123;</div><div class="line">        [self loadMenuData];</div><div class="line">    &#125;</div><div class="line">    self.menuShouldBeShowing = !self.menuShouldBeShowing;</div><div class="line">    [self checkAndUpdateMenuStatus];</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>（心累……原文作者你平时是在看着我写程序吗，还是说天下程序猿都是一样的傻的可爱）</p>
+<p>上面列举的仅仅是更新一个UI所需要的状态。糟糕的是，当我们需要新的信息的时候，我们往往会不假思索地再添上一个<code>property</code>，毕竟已经形成了肌肉记忆了。慢慢地，我们的代码里充满了这些<code>property</code>，以及状态判断的<code>if...else...</code>逻辑。如果有一个地方出了bug，我们得慢慢去找，哪个环节让我们亲爱的状态出了问题。更可怕的是，状态带来的复杂度是随着状态数量增加呈指数级增长的——上面3种状态便能带来2^3种情况，前提还是这3种状态都是一个<code>BOOL</code>值……</p>
+<p><img src="https://timgsa.baidu.com/timg?image&amp;quality=80&amp;size=b9999_10000&amp;sec=1505585974098&amp;di=14500d713bca3617e3177ca4088eecb1&amp;imgtype=jpg&amp;src=http%3A%2F%2Fimg0.imgtn.bdimg.com%2Fit%2Fu%3D3109653125%2C4251890918%26fm%3D214%26gp%3D0.jpg" alt=""></p>
+<h3 id="响应式编程（Reactive-Programming）"><a href="#响应式编程（Reactive-Programming）" class="headerlink" title="响应式编程（Reactive Programming）"></a>响应式编程（Reactive Programming）</h3><p>既然状态这么不好，那我们可不可以不要它了呢？聪明的猿们想到了种种方法，让计算机来帮我追踪和记录这些状态。而我们的工作是在时间轴的开始，就向计算机解释清楚：我需要哪些输入信息才能做出一个特定的输出，对于一些输入，我需要做出什么输出，剩下的事情，就交给计算机去做啦。</p>
+<p>最常见的例子就是我们的「AutoLayout」：我们向计算机说道：“嗯，这个页面放在这个页面里，它的高度是父页面的一半，上边距为10dp，左右居中展示”。然后就哦啦。计算机会在父页面的大小和布局发生改变的时候，帮我们去调整子页面的大小和位置，而不需要我们在各个地方手动去写一堆<code>setFrame:</code>方法。</p>
+<p>这就是<code>响应式编程（Reactive Programming）</code>：我们代码里，只是说明了各个事件（输入）的关系，以及它们相应的输出。当这些事件（输入）发生的时候，计算机根据我们的说明，去进行恰当的响应。「状态」依然是存在的，只不过我们将它们托付给了计算机去处理。<code>响应式编程</code>处理了时间轴上输入和输出的异步问题，让我们轻装上阵，对付各种各样的业务逻辑。</p>
+<p>移动app时代，随着UI元素越来越多，用户交互越来越复杂，处理越来越频繁，需要的实时性也越来越高，这也是<code>响应式编程</code>越来越受到开发者们的青睐的原因吧。</p>
+<hr>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="http://www.sprynthesis.com/2014/06/15/why-reactivecocoa/" target="_blank" rel="external">Why Reactive(Cocoa)?</a></p>
+<p><a href="https://gist.github.com/staltz/868e7e9bc2a7b8c1f754" target="_blank" rel="external">The introduction to Reactive Programming you’ve been missing</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/ReactiveCocoa/" rel="tag"># ReactiveCocoa</a>
+          
+            <a href="/tags/iOS/" rel="tag"># iOS</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/08/15/ReactiveCocoa学习笔记（二）：函数响应式的世界/" rel="next" title="ReactiveCocoa学习笔记（二）：函数式的世界">
+                <i class="fa fa-chevron-left"></i> ReactiveCocoa学习笔记（二）：函数式的世界
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Sheep" />
+          <p class="site-author-name" itemprop="name">Sheep</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/YangGao1991" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      Github
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/1967612625/profile?topnav=1&wvr=6&is_all=1" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                    
+                      Weibo
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#响应式编程"><span class="nav-number">1.</span> <span class="nav-text">响应式编程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#输入和输出"><span class="nav-number">1.1.</span> <span class="nav-text">输入和输出</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#线性编程-Linear-Programming"><span class="nav-number">1.2.</span> <span class="nav-text">线性编程(Linear Programming)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#状态（State）"><span class="nav-number">1.3.</span> <span class="nav-text">状态（State）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#响应式编程（Reactive-Programming）"><span class="nav-number">1.4.</span> <span class="nav-text">响应式编程（Reactive Programming）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-number">2.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Sheep</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("GwKJDV9gM63F0OOouV9L2GVq-gzGzoHsz", "F9uWRrVJ94EkiJGaUXHGNS3s");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
