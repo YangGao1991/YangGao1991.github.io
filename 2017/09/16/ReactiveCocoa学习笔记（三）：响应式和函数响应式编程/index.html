@@ -94,22 +94,22 @@
 
 
 
-<meta name="description" content="上一篇谈了谈我自己对函数式编程的理解。这篇文章会讲到，函数响应式编程到底是个啥。  响应式编程对于响应式编程，我没有找到比这篇文章更为生动详尽的文章了，因此这里大部分是翻译自原文，加上了一些我自己的思考。 输入和输出本质上来说，我们构建应用时，都是在做一件事情：等待一些事件的发生，来提供一些信息作为输入。我们根据这些输入的信息，进行某些处理，生成特定的结果并输出。 输入可以是多种多样的：「用户点">
+<meta name="description" content="上一篇谈了谈我自己对函数式编程的理解。这篇文章会讲到，响应式编程，函数响应式编程这些又是个啥，以及我们为什么要使用它们。  响应式编程对于响应式编程，我没有找到比这篇文章更为生动详尽的文章了，因此这里大部分是翻译自原文，加上了一些我自己的思考。 输入和输出本质上来说，我们构建应用时，都是在做一件事情：等待一些事件的发生，来提供一些信息作为输入。我们根据这些输入的信息，进行某些处理，生成特定的结果">
 <meta name="keywords" content="ReactiveCocoa,iOS">
 <meta property="og:type" content="article">
 <meta property="og:title" content="ReactiveCocoa学习笔记（三）：响应式和函数响应式编程">
 <meta property="og:url" content="http://yoursite.com/2017/09/16/ReactiveCocoa学习笔记（三）：响应式和函数响应式编程/index.html">
 <meta property="og:site_name" content="Sheep&#39;s Blog">
-<meta property="og:description" content="上一篇谈了谈我自己对函数式编程的理解。这篇文章会讲到，函数响应式编程到底是个啥。  响应式编程对于响应式编程，我没有找到比这篇文章更为生动详尽的文章了，因此这里大部分是翻译自原文，加上了一些我自己的思考。 输入和输出本质上来说，我们构建应用时，都是在做一件事情：等待一些事件的发生，来提供一些信息作为输入。我们根据这些输入的信息，进行某些处理，生成特定的结果并输出。 输入可以是多种多样的：「用户点">
+<meta property="og:description" content="上一篇谈了谈我自己对函数式编程的理解。这篇文章会讲到，响应式编程，函数响应式编程这些又是个啥，以及我们为什么要使用它们。  响应式编程对于响应式编程，我没有找到比这篇文章更为生动详尽的文章了，因此这里大部分是翻译自原文，加上了一些我自己的思考。 输入和输出本质上来说，我们构建应用时，都是在做一件事情：等待一些事件的发生，来提供一些信息作为输入。我们根据这些输入的信息，进行某些处理，生成特定的结果">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://www.sprynthesis.com/assets/images/code-timeline.png">
 <meta property="og:image" content="http://www.sprynthesis.com/assets/images/events.png">
 <meta property="og:image" content="http://www.sprynthesis.com/assets/images/state-change.png">
 <meta property="og:image" content="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1505585974098&di=14500d713bca3617e3177ca4088eecb1&imgtype=jpg&src=http%3A%2F%2Fimg0.imgtn.bdimg.com%2Fit%2Fu%3D3109653125%2C4251890918%26fm%3D214%26gp%3D0.jpg">
-<meta property="og:updated_time" content="2017-09-19T15:44:23.000Z">
+<meta property="og:updated_time" content="2017-09-19T15:48:17.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ReactiveCocoa学习笔记（三）：响应式和函数响应式编程">
-<meta name="twitter:description" content="上一篇谈了谈我自己对函数式编程的理解。这篇文章会讲到，函数响应式编程到底是个啥。  响应式编程对于响应式编程，我没有找到比这篇文章更为生动详尽的文章了，因此这里大部分是翻译自原文，加上了一些我自己的思考。 输入和输出本质上来说，我们构建应用时，都是在做一件事情：等待一些事件的发生，来提供一些信息作为输入。我们根据这些输入的信息，进行某些处理，生成特定的结果并输出。 输入可以是多种多样的：「用户点">
+<meta name="twitter:description" content="上一篇谈了谈我自己对函数式编程的理解。这篇文章会讲到，响应式编程，函数响应式编程这些又是个啥，以及我们为什么要使用它们。  响应式编程对于响应式编程，我没有找到比这篇文章更为生动详尽的文章了，因此这里大部分是翻译自原文，加上了一些我自己的思考。 输入和输出本质上来说，我们构建应用时，都是在做一件事情：等待一些事件的发生，来提供一些信息作为输入。我们根据这些输入的信息，进行某些处理，生成特定的结果">
 <meta name="twitter:image" content="http://www.sprynthesis.com/assets/images/code-timeline.png">
 
 
@@ -368,7 +368,7 @@
                   <span class="post-meta-item-text">字数统计</span>
                 
                 <span title="字数统计">
-                  2,770
+                  2,788
                 </span>
               
 
@@ -394,7 +394,7 @@
 
       
         <blockquote>
-<p>上一篇谈了谈我自己对函数式编程的理解。这篇文章会讲到，函数响应式编程到底是个啥。</p>
+<p>上一篇谈了谈我自己对函数式编程的理解。这篇文章会讲到，响应式编程，函数响应式编程这些又是个啥，以及我们为什么要使用它们。</p>
 </blockquote>
 <h2 id="响应式编程"><a href="#响应式编程" class="headerlink" title="响应式编程"></a>响应式编程</h2><p>对于响应式编程，我没有找到比<a href="http://www.sprynthesis.com/2014/06/15/why-reactivecocoa/" target="_blank" rel="external">这篇文章</a>更为生动详尽的文章了，因此这里大部分是翻译自原文，加上了一些我自己的思考。</p>
 <h3 id="输入和输出"><a href="#输入和输出" class="headerlink" title="输入和输出"></a>输入和输出</h3><p>本质上来说，我们构建应用时，都是在做一件事情：等待一些事件的发生，来提供一些信息作为输入。我们根据这些输入的信息，进行某些处理，生成特定的结果并输出。</p>
