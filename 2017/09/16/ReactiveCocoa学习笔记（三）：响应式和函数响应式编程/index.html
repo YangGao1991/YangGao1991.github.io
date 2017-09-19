@@ -106,7 +106,7 @@
 <meta property="og:image" content="http://www.sprynthesis.com/assets/images/events.png">
 <meta property="og:image" content="http://www.sprynthesis.com/assets/images/state-change.png">
 <meta property="og:image" content="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1505585974098&di=14500d713bca3617e3177ca4088eecb1&imgtype=jpg&src=http%3A%2F%2Fimg0.imgtn.bdimg.com%2Fit%2Fu%3D3109653125%2C4251890918%26fm%3D214%26gp%3D0.jpg">
-<meta property="og:updated_time" content="2017-09-19T15:37:07.000Z">
+<meta property="og:updated_time" content="2017-09-19T15:44:23.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ReactiveCocoa学习笔记（三）：响应式和函数响应式编程">
 <meta name="twitter:description" content="上一篇谈了谈我自己对函数式编程的理解。这篇文章会讲到，函数响应式编程到底是个啥。  响应式编程对于响应式编程，我没有找到比这篇文章更为生动详尽的文章了，因此这里大部分是翻译自原文，加上了一些我自己的思考。 输入和输出本质上来说，我们构建应用时，都是在做一件事情：等待一些事件的发生，来提供一些信息作为输入。我们根据这些输入的信息，进行某些处理，生成特定的结果并输出。 输入可以是多种多样的：「用户点">
@@ -368,7 +368,7 @@
                   <span class="post-meta-item-text">字数统计</span>
                 
                 <span title="字数统计">
-                  2,769
+                  2,770
                 </span>
               
 
@@ -424,10 +424,10 @@
 <p>这就是<code>响应式编程（Reactive Programming）</code>：我们代码里，只是说明了各个事件（输入）的关系，以及它们相应的输出。当这些事件（输入）发生的时候，计算机根据我们的说明，去进行恰当的响应。「状态」依然是存在的，只不过我们将它们托付给了计算机去处理。<code>响应式编程</code>处理了时间轴上输入和输出的异步问题，让我们轻装上阵，对付各种各样的业务逻辑。</p>
 <p>移动app时代，随着UI元素越来越多，用户交互越来越复杂，处理越来越频繁，需要的实时性也越来越高，这也是<code>响应式编程</code>越来越受到开发者们的青睐的原因吧。</p>
 <h2 id="函数响应式编程"><a href="#函数响应式编程" class="headerlink" title="函数响应式编程"></a>函数响应式编程</h2><p><code>响应式编程</code>给我们带来了许多的好处，Cocoa框架中也为我们提供了不少<code>响应式编程</code>的支持，例如<code>Autolayout</code>，<code>KVO</code>等等。但是，有没有可能更进一步呢？</p>
-<p><a href="ReactiveCocoa学习笔记（二）：函数式的世界">上一篇文章</a>讲到，函数式编程中，可以将「数据」和「副作用」等封装成一个<code>monad</code>，然后就可以尽享函数式编程的链式编程的丝滑体验了。那如果将我们<code>响应式编程</code>中的「输入」和处理它们的「异步」的逻辑，抽象成一个<code>monad</code>呢？那么，我们将可以使用链式语法和各种强大的函数式编程的工具，处理各种「输入」，以及让「输入」在函数式的“管道”中经过一步步地处理，最终成为我们需要的「输出」。</p>
+<p><a href="https://yanggao1991.github.io/2017/08/15/ReactiveCocoa学习笔记（二）：函数式的世界/" target="_blank" rel="external">上一篇文章</a>讲到，函数式编程中，可以将「数据」和「副作用」等封装成一个<code>monad</code>，然后就可以尽享函数式编程的链式编程的丝滑体验了。那如果将我们<code>响应式编程</code>中的「输入」和处理它们的「异步」的逻辑，抽象成一个<code>monad</code>呢？那么，我们将可以使用链式语法和各种强大的函数式编程的工具，处理各种「输入」，以及让「输入」在函数式的“管道”中经过一步步地处理，最终成为我们需要的「输出」。</p>
 <p>没错，这就是<code>函数响应式</code>编程的魅力了！它将一个<strong>随时间变化的值</strong>抽象成一个流，并通过<code>monad</code>使其可以利用到函数式编程的强大工具，最终让我们可以方便直观地处理各种「输入」和「输出」的异步处理逻辑。</p>
 <blockquote>
-<p>Functional reactive programming (FRP) is a programming paradigm for reactive programming (asynchronous dataflow programming) using the building blocks of functional programming (e.g. map, reduce, filter). </p>
+<p>Functional reactive programming (FRP) is a programming paradigm for reactive programming (asynchronous dataflow programming) using the building blocks of functional programming (e.g. map, reduce, filter). – Wikipedia</p>
 </blockquote>
 <h2 id="函数响应式编程-amp-函数式响应式编程"><a href="#函数响应式编程-amp-函数式响应式编程" class="headerlink" title="函数响应式编程&amp;函数式响应式编程"></a>函数响应式编程&amp;函数式响应式编程</h2><p>网络上的教程都说，<code>ReactiveCocoa</code>（以及<code>RXSwift</code>）是一个<code>函数式响应式</code>的变成框架，而没有说是“<code>函数响应式</code>框架”，让人傻傻分不清楚。这是为什么呢？</p>
 <p>在上文中，其实强调了<code>函数响应式</code>中抽象出的值流是随时间连续变化的，其抽象称为「behaviors」；而像<code>ReactiveCocoa</code>（或是<code>RXSwift</code>）这类框架是应用于主要处理人机交互的移动软件的，它抽象出的「输入」流是时间轴上离散的一个个事件，称为「Event」。这就是两者的区别所在。</p>
