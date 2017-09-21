@@ -102,7 +102,7 @@
 <meta property="og:site_name" content="Sheep&#39;s Blog">
 <meta property="og:description" content="本文主要讲了我自己对函数式编程的理解。涉及到编程范式的方面，个人的理解不免有遗漏、不准确甚至错误的地方，希望能多多批评、交流、指正。  我们认识事物，总是要问一下「What」「Why」「How」。那么，ReactiveCocoa是什么呢？ 说到ReactiveCocoa，相信大部分看过介绍的人都会看到一句开场白：  ReactiveCocoa是一个函数式响应式的编程框架。  WTF，这个函数式响">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2017-09-21T03:49:11.000Z">
+<meta property="og:updated_time" content="2017-09-21T14:58:51.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ReactiveCocoa学习笔记（二）：函数式的世界">
 <meta name="twitter:description" content="本文主要讲了我自己对函数式编程的理解。涉及到编程范式的方面，个人的理解不免有遗漏、不准确甚至错误的地方，希望能多多批评、交流、指正。  我们认识事物，总是要问一下「What」「Why」「How」。那么，ReactiveCocoa是什么呢？ 说到ReactiveCocoa，相信大部分看过介绍的人都会看到一句开场白：  ReactiveCocoa是一个函数式响应式的编程框架。  WTF，这个函数式响">
@@ -363,7 +363,7 @@
                   <span class="post-meta-item-text">字数统计</span>
                 
                 <span title="字数统计">
-                  3,837
+                  3,842
                 </span>
               
 
@@ -426,7 +426,7 @@
 <p>以上这段话是wiki中函数式编程的定义。在这段话中，有两个地方值得注意：</p>
 <p>首先，「mathematical functions」，即数学意义上的函数意味着什么呢？它意味着一个函数要想成为函数式编程中的一等公民，可是有门槛的——它必须是<code>纯函数(pure function)</code>。</p>
 <p>来看这样一段代码：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">// 代码4</div><div class="line">@implement ClassA</div><div class="line"></div><div class="line">@property (readwrite) NSInteger count;</div><div class="line"></div><div class="line">- (NSInteger)doAdd:(NSInteger)x &#123;</div><div class="line">	return self.count + x;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">// 代码4</div><div class="line">@interface ClassA : NSObject</div><div class="line"></div><div class="line">@property (readwrite) NSInteger count;</div><div class="line"></div><div class="line">@end</div><div class="line"></div><div class="line">@implementation ClassA</div><div class="line"></div><div class="line">- (NSInteger)doAdd:(NSInteger)x &#123;</div><div class="line">    return self.count + x;</div><div class="line">&#125;</div><div class="line">@end</div></pre></td></tr></table></figure>
 <p>其中的<code>doAdd</code>函数的返回值，毫无疑问是依赖于外部的变量<code>count</code>的。当<code>count</code>的值发生变化时，即使入参<code>x</code>的值不变，该函数也会返回一个完全不同的值。而这是纯函数绝不容许发生的：在数学上，一个函数的返回值是完全取决于输入的参数的，即对于相同的参数，必然会产生相同的结果。这就是纯函数所必须的第一个要求——确定性。</p>
 <p>其次，「avoids changing-state and mutable data」说的则是“一等公民”的另一个重要的特点——纯函数必须不能产生<code>副作用</code>。<code>副作用</code>是指一个函数在运行过程中对函数外部世界的影响，比如修改外部的变量(changing-state)，改变可变数据(mutable data)，或者进行io操作等等。此外，由于「循环」操作需要依靠循环变量作为中间值，所以在纯函数中，循环也是不被允许的，其可被「递归」代替。而递归所产生的调用栈太深的问题，可以由「尾递归优化」解决，这里不多深入探讨了。</p>
 <p>一句话总结，纯函数必须只完成自己的工作，对外部世界一无所知，既不依赖于外部世界，也不会对外部世界产生影响。</p>
