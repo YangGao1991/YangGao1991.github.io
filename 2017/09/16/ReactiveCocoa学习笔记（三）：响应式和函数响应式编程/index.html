@@ -106,7 +106,7 @@
 <meta property="og:image" content="http://www.sprynthesis.com/assets/images/events.png">
 <meta property="og:image" content="http://www.sprynthesis.com/assets/images/state-change.png">
 <meta property="og:image" content="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1505585974098&di=14500d713bca3617e3177ca4088eecb1&imgtype=jpg&src=http%3A%2F%2Fimg0.imgtn.bdimg.com%2Fit%2Fu%3D3109653125%2C4251890918%26fm%3D214%26gp%3D0.jpg">
-<meta property="og:updated_time" content="2017-09-21T06:01:04.000Z">
+<meta property="og:updated_time" content="2017-10-25T17:08:58.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ReactiveCocoa学习笔记（三）：响应式和函数响应式编程">
 <meta name="twitter:description" content="上一篇谈了谈我自己对函数式编程的理解。这篇文章会讲到，响应式编程，函数响应式编程这些又是个啥，以及我们为什么要使用它们。  响应式编程对于响应式编程，我没有找到比这篇文章更为生动详尽的文章了，因此这里大部分是翻译自原文，加上了一些我自己的思考。 输入和输出本质上来说，我们构建应用时，都是在做一件事情：等待一些事件的发生，来提供一些信息作为输入。我们根据这些输入的信息，进行某些处理，生成特定的结果">
@@ -429,7 +429,7 @@
 <blockquote>
 <p>Functional reactive programming (FRP) is a programming paradigm for reactive programming (asynchronous dataflow programming) using the building blocks of functional programming (e.g. map, reduce, filter). – Wikipedia</p>
 </blockquote>
-<h2 id="函数响应式编程-amp-函数式响应式编程"><a href="#函数响应式编程-amp-函数式响应式编程" class="headerlink" title="函数响应式编程&amp;函数式响应式编程"></a>函数响应式编程&amp;函数式响应式编程</h2><p>网络上的教程都说，<code>ReactiveCocoa</code>（以及<code>RXSwift</code>）是一个<code>函数式响应式</code>的变成框架，而没有说是“<code>函数响应式</code>框架”，让人傻傻分不清楚。这是为什么呢？</p>
+<h2 id="函数响应式编程-amp-函数式响应式编程"><a href="#函数响应式编程-amp-函数式响应式编程" class="headerlink" title="函数响应式编程&amp;函数式响应式编程"></a>函数响应式编程&amp;函数式响应式编程</h2><p>网络上的教程都说，<code>ReactiveCocoa</code>（以及<code>RXSwift</code>）是一个<code>函数式响应式</code>的编程框架，而没有说是“<code>函数响应式</code>框架”，让人傻傻分不清楚。这是为什么呢？</p>
 <p>在上文中，其实强调了<code>函数响应式</code>中抽象出的值流是随时间连续变化的，其抽象称为「behaviors」；而像<code>ReactiveCocoa</code>（或是<code>RXSwift</code>）这类框架是应用于主要处理人机交互的移动软件的，它抽象出的「输入」流是时间轴上离散的一个个事件，称为「Event」。这就是两者的区别所在。</p>
 <p>其实我个人觉得，这种区分在实际的应用中对于我们来说并不重要，<code>ReactiveCocoa</code>的<a href="https://github.com/ReactiveCocoa/ReactiveCocoa" target="_blank" rel="external">Github主页</a>也介绍自己为「Streams of values over time」。重要的是能够理解<code>函数响应式</code>编程的思想，这样，在使用类似框架的时候，才能做到知其然并知其所以然。</p>
 <hr>
