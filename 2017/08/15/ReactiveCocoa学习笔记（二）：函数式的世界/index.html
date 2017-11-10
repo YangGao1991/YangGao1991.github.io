@@ -102,13 +102,12 @@
 <meta property="og:site_name" content="Sheep&#39;s Blog">
 <meta property="og:description" content="本文主要讲了我自己对函数式编程的理解。涉及到编程范式的方面，个人的理解不免有遗漏、不准确甚至错误的地方，希望能多多批评、交流、指正。  我们认识事物，总是要问一下「What」「Why」「How」。那么，ReactiveCocoa是什么呢？ 说到ReactiveCocoa，相信大部分看过介绍的人都会看到一句开场白：  ReactiveCocoa是一个函数式响应式的编程框架。  WTF，这个函数式响">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://ownwf2t93.bkt.clouddn.com/image/chechuang.png">
-<meta property="og:image" content="http://ownwf2t93.bkt.clouddn.com/image/chechuangs.png">
-<meta property="og:updated_time" content="2017-10-16T02:30:00.000Z">
+<meta property="og:image" content="http://ownwf2t93.bkt.clouddn.com/drill-444493__480.jpg">
+<meta property="og:updated_time" content="2017-11-10T14:29:51.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ReactiveCocoa学习笔记（二）：函数式的世界">
 <meta name="twitter:description" content="本文主要讲了我自己对函数式编程的理解。涉及到编程范式的方面，个人的理解不免有遗漏、不准确甚至错误的地方，希望能多多批评、交流、指正。  我们认识事物，总是要问一下「What」「Why」「How」。那么，ReactiveCocoa是什么呢？ 说到ReactiveCocoa，相信大部分看过介绍的人都会看到一句开场白：  ReactiveCocoa是一个函数式响应式的编程框架。  WTF，这个函数式响">
-<meta name="twitter:image" content="http://ownwf2t93.bkt.clouddn.com/image/chechuang.png">
+<meta name="twitter:image" content="http://ownwf2t93.bkt.clouddn.com/drill-444493__480.jpg">
 
 
 
@@ -366,7 +365,7 @@
                   <span class="post-meta-item-text">字数统计</span>
                 
                 <span title="字数统计">
-                  3,987
+                  3,989
                 </span>
               
 
@@ -418,7 +417,9 @@
 <p>虽然代码很简单，但是还是可以稍作分析：<code>multipliedByThree</code>函数是我们对一个处理数据的「行为」的抽象，<code>map</code>也是我们对一个处理数据（数组或其他集合）的「行为」的抽象，同时，<code>map</code>是一个高阶函数：它接受另一个函数作为参数。通过<code>multipliedByThree</code>和<code>map</code>的抽象，我们得以在<code>代码3</code>中，使用简明干练的语法和代码，完成对一个集合的复杂处理：<strong>我们需要返回一个新数组，它的每一个元素值都是原数组中对应值的3倍</strong>。</p>
 <p>注意上面最后一句话，这是很直观的一个「声明式」的语句。再回头看看上面的<code>代码3</code>，你会发现这段代码也充满了「声明式」的意味。我们在这里只是告诉计算机，我们「需要的」是什么，而不是去描述我们应当「怎么去做」（遍历集合中的每个元素，将该值乘以3，并添加到一个新的集合中，最后返回这个新的集合）。</p>
 <p>这正是函数式编程的魅力之一：它将原本的<code>命令式编程(Imperative)</code>变成了<code>声明式编程(Declarative)</code>，将「How to do」变成了「What we want」，将思考「如何把这个问题用代码实现」转变成了「如何用代码去描述这个问题」，从而使得代码更加简洁明了和具有自注释性。诸如<code>map</code>的函数正是对「行为」的抽象，而通过抽象出若干个更小的、更通用的<code>行为</code>，将细节（如iteration）隐藏在了抽象中，我们外部的代码也就具有了「声明式」的性质。</p>
-<p>此外，由于有了<code>map</code>的抽象和其接受另一个函数为参数的高阶函数特性，我们能够将不同作用的函数应用于同一份<code>map</code>代码上，来实现对数据的不同的处理，从而使得代码的功能结构更加清晰，模块性和可复用性大大增加。这就好比同样的原材料，同样的一台车床，只要更换不同的刀头，我们就能做出不一样的成品来。<br><img src="http://ownwf2t93.bkt.clouddn.com/image/chechuang.png" alt=""></p>
+<p>此外，由于有了<code>map</code>的抽象和其接受另一个函数为参数的高阶函数特性，我们能够将不同作用的函数应用于同一份<code>map</code>代码上，来实现对数据的不同的处理，从而使得代码的功能结构更加清晰，模块性和可复用性大大增加。这就好比同样的原材料，同样的一台车床机器，只要更换不同的刀头，我们就能做出不一样的成品来。</p>
+<div align="center"><br><img src="http://ownwf2t93.bkt.clouddn.com/drill-444493__480.jpg" alt=""><br></div>
+
 <p>对于上面这几段代码，还有两点想补充解释：</p>
 <ol>
 <li>这里的<code>map</code>函数表现为<code>NSArray</code>的一个方法。但是，从本质上说，这个操作是可以普遍存在的，不依赖于这一个类。下文对此会有更详细的描述。</li>
@@ -445,7 +446,7 @@
 <p>（注：这里只是简单说明了<code>monad</code>的概念，感兴趣的可以深入阅读参考资料中的相关内容）</p>
 <p>实现了上述两个接口函数的数据结构就是<code>monad</code>。根据其中封装的「副作用」的不同，产生了各种各样的<code>monad</code>，比如可以包含若干可能类型的值的<code>Maybe</code>或者进行io操作的<code>io monad</code>；而有了<code>map</code>和<code>bind</code>函数来保证管道前后的数据类型的一致性，我们则可以玩出这样的花样：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">// 代码5</div><div class="line">[[[[BoxValue bind:block1] </div><div class="line">			 bind:block2]</div><div class="line">			  map:block3]</div><div class="line">			 bind:block4];</div></pre></td></tr></table></figure>
-<p>我们不仅可以像这样协调串联起各个不同类型，不同作用的函数（<code>block1</code>，<code>block2</code>，<code>block3</code>，<code>block4</code>）所组成的整个传递链，使得数据可以在这样的链式操作中进行一步步地操作，而且在传递的过程中还可以由<code>monad</code>自动处理上下文的信息，使得我们可以专注于处理真正的值。这就很厉害了，可以说<code>monad</code>是函数式编程可以进行链式操作（有的地方也叫流式操作）的基础。<br><img src="http://ownwf2t93.bkt.clouddn.com/image/chechuangs.png" alt=""></p>
+<p>我们不仅可以像这样协调串联起各个不同类型，不同作用的函数（<code>block1</code>，<code>block2</code>，<code>block3</code>，<code>block4</code>）所组成的整个传递链，使得数据可以在这样的链式操作中进行一步步地操作，而且在传递的过程中还可以由<code>monad</code>自动处理上下文的信息，使得我们可以专注于处理真正的值。这就很厉害了，可以说<code>monad</code>是函数式编程可以进行链式操作（有的地方也叫流式操作）的基础。</p>
 <p>回过头看我们上面的<code>代码2</code>和<code>代码3</code>，发现什么端倪了吗？没错，<code>代码2</code>就是「数组」这个数据类型对<code>map</code>函数的实现，而<code>代码3</code>则是“一段管道”，所以，在这里「数组」就是一个<code>Functor</code>了。</p>
 <p>而我们这个系列的主角——ReactiveCocoa，也是建立在一个<code>monad</code>的基础上的——<code>RACStream</code>类及其子类，这个<code>monad</code>封装了「异步」的副作用，从而使得函数式响应式的编程得以实现，当然这是后话了，在后续系列的文章中会详尽阐述。</p>
 <h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>函数式编程的优点总结起来大概有这么几点：</p>
