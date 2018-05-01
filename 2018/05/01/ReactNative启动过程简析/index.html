@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="ReactNative,iOS," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="ReactNative（以下简称RN）是近年移动端非常火的技术。我们也在前段时间用RN实现了一个小的功能模块，上线效果还可以。因此，暂时对前一阶段的工作进行一下梳理和小结。这一系列将从原理、实践的角度谈谈RN，以及在实现过程中的一些经(da)验(keng)。这篇文章，主要从启动流程的角度，谈谈在启动背后，RN都做了些什么。对RN的探讨和总结都基于0.46.4版本，下同。  假定，我们已经通过re">
+<meta name="keywords" content="ReactNative,iOS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ReactNative启动过程简析">
+<meta property="og:url" content="http://yoursite.com/2018/05/01/ReactNative启动过程简析/index.html">
+<meta property="og:site_name" content="Sheep&#39;s Blog">
+<meta property="og:description" content="ReactNative（以下简称RN）是近年移动端非常火的技术。我们也在前段时间用RN实现了一个小的功能模块，上线效果还可以。因此，暂时对前一阶段的工作进行一下梳理和小结。这一系列将从原理、实践的角度谈谈RN，以及在实现过程中的一些经(da)验(keng)。这篇文章，主要从启动流程的角度，谈谈在启动背后，RN都做了些什么。对RN的探讨和总结都基于0.46.4版本，下同。  假定，我们已经通过re">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://ownwf2t93.bkt.clouddn.com/react-native-xcode.png">
+<meta property="og:updated_time" content="2018-05-01T09:05:49.823Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ReactNative启动过程简析">
+<meta name="twitter:description" content="ReactNative（以下简称RN）是近年移动端非常火的技术。我们也在前段时间用RN实现了一个小的功能模块，上线效果还可以。因此，暂时对前一阶段的工作进行一下梳理和小结。这一系列将从原理、实践的角度谈谈RN，以及在实现过程中的一些经(da)验(keng)。这篇文章，主要从启动流程的角度，谈谈在启动背后，RN都做了些什么。对RN的探讨和总结都基于0.46.4版本，下同。  假定，我们已经通过re">
+<meta name="twitter:image" content="http://ownwf2t93.bkt.clouddn.com/react-native-xcode.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"hide","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/05/01/ReactNative启动过程简析/"/>
+
+
+
+
+
+  <title>ReactNative启动过程简析 | Sheep's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Sheep's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">In This Life We Believe</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/01/ReactNative启动过程简析/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Sheep">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Sheep's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">ReactNative启动过程简析</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-01T17:00:26+08:00">
+                2018-05-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS开发/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS开发</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2018/05/01/ReactNative启动过程简析/" class="leancloud_visitors" data-flag-title="ReactNative启动过程简析">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                  <span class="post-meta-divider">|</span>
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计</span>
+                
+                <span title="字数统计">
+                  1,892
+                </span>
+              
+
+              
+
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>ReactNative（以下简称RN）是近年移动端非常火的技术。我们也在前段时间用RN实现了一个小的功能模块，上线效果还可以。因此，暂时对前一阶段的工作进行一下梳理和小结。这一系列将从原理、实践的角度谈谈RN，以及在实现过程中的一些经(da)验(keng)。<br>这篇文章，主要从启动流程的角度，谈谈在启动背后，RN都做了些什么。<br>对RN的探讨和总结都基于0.46.4版本，下同。</p>
+</blockquote>
+<p>假定，我们已经通过<code>react-native init</code>命令，或是集成到现有项目中的方式，拥有了一个可以跑起来的RN项目了。当我们在xcode中点击了编译按钮，到最终，一个让人欣喜的app在模拟器或者设备中运行了起来，这中间发生了些什么呢。</p>
+<h2 id="Stage-1-准备工作"><a href="#Stage-1-准备工作" class="headerlink" title="Stage 1. 准备工作"></a>Stage 1. 准备工作</h2><p>首先，第一阶段和两个脚本有关。</p>
+<p>在<code>React.xcodeproj</code>工程的<code>build phase</code>中，可以看到<code>Start Packager</code>。这里会执行一段脚本：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">if [ -z &quot;$&#123;RCT_NO_LAUNCH_PACKAGER+xxx&#125;&quot; ] ; then</div><div class="line">if nc -w 5 -z localhost 8091 ; then</div><div class="line">if ! curl -s &quot;http://localhost:8081/status&quot; | grep -q &quot;packager-status:running&quot; ; then</div><div class="line">echo &quot;Port 8081 already in use, packager is either not running or not running correctly&quot;</div><div class="line">exit 2</div><div class="line">fi</div><div class="line">else</div><div class="line">open &quot;/Users/gaoyang/Documents/code/QRMedalHallRN/node_modules/react-native/scripts/launchPackager.command&quot; || echo &quot;Can&apos;t start packager automatically&quot;</div><div class="line">fi</div><div class="line">fi</div></pre></td></tr></table></figure></p>
+<p>在这里执行了<code>launchPackager.command</code>，该命令会调用<code>./local-cli/cli.js</code>的<code>start</code>命令，其最终走到<code>./local-cli/server/runServer.js - runServer()</code>中，创建了一个server，端口号默认为8081，用于接下来客户端请求本地js文件。</p>
+<p>在主工程的<code>build phase</code>中，同样会执行一段脚本<code>Bundle React Native code and images</code>：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">export NODE_BINARY=node</div><div class="line">/Users/gaoyang/Documents/code/QRMedalHallRN/node_modules/react-native/scripts/react-native-xcode.sh</div></pre></td></tr></table></figure></p>
+<p>这个脚本的作用主要是判断各种环境，条件，来判断是应当采用本地server模式，还是静态bundle模式来加载业务js文件。</p>
+<ul>
+<li>本地server模式，即从上面所说的创建的本地server实时获取经过编译/打包后的bundle文件；</li>
+<li>静态bundle模式，是指将业务js文件打包成bundle后，置入asset中，当做静态资源来使用。</li>
+</ul>
+<p>首先，脚本会判断是dev/release环境，模拟器/真机。如果是dev环境+模拟器，那么什么都不会做，因为默认会采用本地server模式。如果是dev环境+真机，或者是release环境，那么会调用到<code>./local-cli/cli.js bundle</code>命令，将本地所有js文件打包成<code>main.jsbundle</code>，并置入app bundle中。此外，如果是dev环境+真机，还会获取当前网络ip地址，写入<code>ip.txt</code>并置入app bundle，这是为了真机调试也可以采用server的方式调试。如下图所示：</p>
+<div align="center"><br><img src="http://ownwf2t93.bkt.clouddn.com/react-native-xcode.png" alt=""><br></div>
+
+<h2 id="Stage-2-获取bundle地址"><a href="#Stage-2-获取bundle地址" class="headerlink" title="Stage 2. 获取bundle地址"></a>Stage 2. 获取bundle地址</h2><p>接下来，就到了iOS代码中。加载RN业务的时候，我们得知道从哪里获取业务的bundle。其实这一步是和上面<code>react-native-xcode.sh</code>干的活儿对应的。这里逻辑主要在<code>[RCTBundleURLProvider jsBundleURLForBundleRoot:fallbackResource:]</code>方法中。该方法就是去获取业务所需的bundle路径。</p>
+<p>该方法中，同样会判断是否是Dev/Release环境。如果是Release环境，那么直接从<code>[NSBundle mainBundle]</code>中获取上面生成好的<code>main.jsbundle</code>文件；如果是Dev环境，那么会去获取本地server的host地址，即上面写入的<code>ip.txt</code>文件，或者采用<code>localhost</code>：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">static NSString *ipGuess;</div><div class="line">static dispatch_once_t onceToken;</div><div class="line">dispatch_once(&amp;onceToken, ^&#123;</div><div class="line">NSString *ipPath = [[NSBundle mainBundle] pathForResource:@&quot;ip&quot; ofType:@&quot;txt&quot;];</div><div class="line">ipGuess = [[NSString stringWithContentsOfFile:ipPath encoding:NSUTF8StringEncoding error:nil]</div><div class="line">           stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]];</div><div class="line">&#125;);</div><div class="line"></div><div class="line">NSString *host = ipGuess ?: @&quot;localhost&quot;;</div></pre></td></tr></table></figure></p>
+<p>接着，会发送一条网络请求到该server，判断server是否处于running状态。如果这里失败了，那么还是会从<code>[NSBundle mainBundle]</code>中取静态的<code>main.jsbundle</code>文件；否则，就从server请求实时的bundle文件。</p>
+<h2 id="Stage-3-初始化环境"><a href="#Stage-3-初始化环境" class="headerlink" title="Stage 3. 初始化环境"></a>Stage 3. 初始化环境</h2><p>在上一步，拿到了业务bundle地址后，就可以着手准备初始化环境了。这里分两种：一种是RN默认的不分包加载的方式，一种是业界采用的分包加载的方式。这两种方式的区别在于<code>RCTBridge</code>的初始化时机不同（<code>RCTBridge</code>是Native端负责Native与JS通信的桥梁）：</p>
+<ul>
+<li>不分包加载</li>
+</ul>
+<p>不分包加载的情况下，通过上一步取到业务bundle的地址后，就可以直接调用<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">RCTRootView *rootView = [[RCTRootView alloc] initWithBundleURL:jsCodeLocation</div><div class="line">                                                    moduleName:@&quot;QRMedalHallRN&quot;</div><div class="line">                                             initialProperties:nil</div><div class="line">                                                 launchOptions:launchOptions];</div></pre></td></tr></table></figure></p>
+<p>方法来初始化一个<code>rootView</code>了。在这个方法中会首先去初始化<code>RCTBridge</code>，在初始化的过程中会调用[RCTJavaScriptLoader loadBundleAtURL:onProgress:onComplete:]进行bundle的加载。</p>
+<ul>
+<li>分包加载</li>
+</ul>
+<p>分包加载的情况下，通常会将<code>common bundle</code>进行预加载。<code>RCTBridge</code>在这时就已经初始化完成了。后面的各个业务bundle可以使用同一个<code>RCTBridge</code>来创建<code>RCTRootView</code>，不必重复创建。因此，在分包加载的情况下，通过上一步取到业务bundle的地址后，直接手动调用[RCTJavaScriptLoader loadBundleAtURL:onProgress:onComplete:]进行bundle的加载。</p>
+<p>初始化<code>RCTBridge</code>的过程中，主要做了这些事：</p>
+<ol>
+<li>创建了RN线程<code>_jsThread</code>，并开启了<code>runloop</code>。</li>
+<li>初始化了所有不能被懒加载的native模块。</li>
+<li>初始化了<code>NativeToJSBridge</code>和<code>JSToNativeBridge</code>，用于Native端与JS端的通信。</li>
+<li>创建了<code>JSCExecutor</code>，它是实际上的最主要的方法执行者。<code>JSCExecutor</code>创建了一个global的<code>JSContext</code>。</li>
+<li><code>loadSource</code>：也就是在这一步，调用了[RCTJavaScriptLoader loadBundleAtURL:onProgress:onComplete:]对bundle进行加载（不分包的情况下），主要是将bundle以<code>NSData</code>的方式加载到内存中。</li>
+<li>在上述步骤都完成后，会调用<code>executeSourceCode</code>将已经加载到内存中的bundle执行。这一步是在[bridge enqueueApplicationScript:url:onComplete:completion]中进行的。</li>
+<li>在第6步执行完毕后，会做两件事情：创建一个<code>CADisplayLink</code>，并添加到RN线程的<code>runloop</code>中；并抛出一个<code>RCTJavaScriptDidLoadNotification</code>，通知jsBundle已经完成加载。</li>
+</ol>
+<p>关于<code>RCTBridge</code>具体的初始化细节，以及Native与JS通信的原理和过程，请参考<a href="http://zxfcumtcs.github.io/2017/10/08/ReactNativeCommunicationMechanism/" target="_blank" rel="external">我师父的文章^w^</a></p>
+<p><code>RCTRootView</code>在接收到<code>RCTJavaScriptDidLoadNotification</code>通知后，会创建一个<code>RCTRootContentView</code>，用于页面的实际展示。然后，会调用<code>runApplication</code>方法：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">- (void)runApplication:(RCTBridge *)bridge</div><div class="line">&#123;</div><div class="line">  NSString *moduleName = _moduleName ?: @&quot;&quot;;</div><div class="line">  NSDictionary *appParameters = @&#123;</div><div class="line">    @&quot;rootTag&quot;: _contentView.reactTag,</div><div class="line">    @&quot;initialProps&quot;: _appProperties ?: @&#123;&#125;,</div><div class="line">  &#125;;</div><div class="line"></div><div class="line">  RCTLogInfo(@&quot;Running application %@ (%@)&quot;, moduleName, appParameters);</div><div class="line">  [bridge enqueueJSCall:@&quot;AppRegistry&quot;</div><div class="line">                 method:@&quot;runApplication&quot;</div><div class="line">                   args:@[moduleName, appParameters]</div><div class="line">             completion:NULL];</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>该方法调用了js端，<code>AppRegistry.js</code>的<code>runApplication</code>方法，并将<code>moduleName</code>，<code>initialProps</code>等参数传到js端。其中，<code>moduleName</code>就是在业务入口文件<code>index.ios.js</code>中注册的业务名称：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">AppRegistry.registerComponent(&apos;QRMedalHallRN&apos;, () =&gt; QRMedalHallRN);</div></pre></td></tr></table></figure></p>
+<h2 id="Stage-4-完成！"><a href="#Stage-4-完成！" class="headerlink" title="Stage 4. 完成！"></a>Stage 4. 完成！</h2><p>控制权交给js端。<code>AppRegistry.js</code>中保存了一份所有通过<code>AppRegistry.registerComponent()</code>注册的业务的映射表<code>runnables</code>，其key为<code>appKey</code>，也就是上面说的<code>moduleName</code>。每个key对应一个<code>run()</code>函数。</p>
+<p>在收到Native端传过来的<code>moduleName</code>，<code>initialProps</code>参数后，会从<code>runnables</code>中找到该注册过的业务，执行相应的<code>run()</code>函数。<code>run()</code>函数中最终调用了<code>ReactNative.render()</code>函数。接着，RN会根据配置，决定是采用新的React引擎<code>Fiber</code>，还是老的<code>Stack</code>来进行渲染。至此，初始化工作完成。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>这篇文章归纳整理了一下RN初始化流程。虽然这些流程大部分都被封装成了几个简单的接口，但了解这一流程的原理还是有好处的，比如说，在分工程调试（一个主工程，一个RN单独的工程）的时候，可以修改一些参数，使得主工程可以直接读取到RN工程中的业务js代码。</p>
+<p>刚刚接触RN（前端）的知识，如果有说的不对的地方还请指教。^^</p>
+<hr>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><p><a href="http://zxfcumtcs.github.io/2017/10/08/ReactNativeCommunicationMechanism/" target="_blank" rel="external">ReactNative源码解析——通信机制详解系列</a></p>
+<p><a href="http://blog.cnbang.net/tech/3461/" target="_blank" rel="external">React Native 源码导读(零) – 创建/运行/调试</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/ReactNative/" rel="tag"># ReactNative</a>
+          
+            <a href="/tags/iOS/" rel="tag"># iOS</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/12/01/ReactiveCocoa学习笔记（四）：基础使用手册/" rel="next" title="ReactiveCocoa学习笔记（四）：「RAC微博」基础使用手册">
+                <i class="fa fa-chevron-left"></i> ReactiveCocoa学习笔记（四）：「RAC微博」基础使用手册
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      
+       <div id="gitment-container"></div>
+      
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Sheep" />
+          <p class="site-author-name" itemprop="name">Sheep</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/YangGao1991" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      Github
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/1967612625/profile?topnav=1&wvr=6&is_all=1" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                    
+                      Weibo
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Stage-1-准备工作"><span class="nav-number">1.</span> <span class="nav-text">Stage 1. 准备工作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Stage-2-获取bundle地址"><span class="nav-number">2.</span> <span class="nav-text">Stage 2. 获取bundle地址</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Stage-3-初始化环境"><span class="nav-number">3.</span> <span class="nav-text">Stage 3. 初始化环境</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Stage-4-完成！"><span class="nav-number">4.</span> <span class="nav-text">Stage 4. 完成！</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Reference"><span class="nav-number">6.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Sheep</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+     
+     
+     
+     
+     <link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
+     <script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+     
+         <script type="text/javascript">
+             var gitment = new Gitment({
+                id: document.location.href, 
+                 owner: 'YangGao1991',
+                 repo: 'YangGao1991.github.io',
+                 oauth: {
+                     client_id: 'b0c19a79472eff7c9d65',
+                     client_secret: '889e377d497290f1d8341cc026e09da0cd0ac531',
+                 }});
+             gitment.render('gitment-container');
+         </script>
+     
+ 
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("GwKJDV9gM63F0OOouV9L2GVq-gzGzoHsz", "F9uWRrVJ94EkiJGaUXHGNS3s");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
