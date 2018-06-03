@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="ReactNative,iOS," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="在做ReactNative的业务过程中，由于碰到了不少奇(keng)妙(die)的问题，所以不免要从源码入手，探究一下各个方面的原理。这一篇文章就是由一个图片路径问题引出的总结。  我们知道，ReactNative 中创建一个图片组件有两种方式：123456789// 代码1// 指定一个本地图片资源&amp;lt;Image source=&amp;#123;require(&amp;apos;../../../im">
+<meta name="keywords" content="ReactNative,iOS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ReactNative图片解析及渲染流程">
+<meta property="og:url" content="http://yoursite.com/2018/06/03/ReactNative图片解析及渲染流程/index.html">
+<meta property="og:site_name" content="Sheep&#39;s Blog">
+<meta property="og:description" content="在做ReactNative的业务过程中，由于碰到了不少奇(keng)妙(die)的问题，所以不免要从源码入手，探究一下各个方面的原理。这一篇文章就是由一个图片路径问题引出的总结。  我们知道，ReactNative 中创建一个图片组件有两种方式：123456789// 代码1// 指定一个本地图片资源&amp;lt;Image source=&amp;#123;require(&amp;apos;../../../im">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-06-03T13:30:06.957Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ReactNative图片解析及渲染流程">
+<meta name="twitter:description" content="在做ReactNative的业务过程中，由于碰到了不少奇(keng)妙(die)的问题，所以不免要从源码入手，探究一下各个方面的原理。这一篇文章就是由一个图片路径问题引出的总结。  我们知道，ReactNative 中创建一个图片组件有两种方式：123456789// 代码1// 指定一个本地图片资源&amp;lt;Image source=&amp;#123;require(&amp;apos;../../../im">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"hide","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/06/03/ReactNative图片解析及渲染流程/"/>
+
+
+
+
+
+  <title>ReactNative图片解析及渲染流程 | Sheep's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Sheep's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Try...Catch!</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/03/ReactNative图片解析及渲染流程/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Sheep">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Sheep's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">ReactNative图片解析及渲染流程</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-03T17:01:26+08:00">
+                2018-06-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS开发/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS开发</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2018/06/03/ReactNative图片解析及渲染流程/" class="leancloud_visitors" data-flag-title="ReactNative图片解析及渲染流程">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                  <span class="post-meta-divider">|</span>
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计</span>
+                
+                <span title="字数统计">
+                  2,225
+                </span>
+              
+
+              
+
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>在做ReactNative的业务过程中，由于碰到了不少奇(keng)妙(die)的问题，所以不免要从源码入手，探究一下各个方面的原理。这一篇文章就是由一个图片路径问题引出的总结。</p>
+</blockquote>
+<p>我们知道，<code>ReactNative</code> 中创建一个图片组件有两种方式：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">// 代码1</div><div class="line"></div><div class="line">// 指定一个本地图片资源</div><div class="line">&lt;Image source=&#123;require(&apos;../../../images_QRMedalHallRN/ranklinel.png&apos;)&#125; style=&#123;styles.medalRankLine&#125;&gt;</div><div class="line">&lt;/Image&gt;</div><div class="line"></div><div class="line">// 指定一个网络图片资源</div><div class="line">&lt;Image source=&#123;&#123;uri:this.state.icon&#125;&#125; style=&#123;styles.medalPic&#125;&gt;</div><div class="line">&lt;/Image&gt;</div></pre></td></tr></table></figure></p>
+<p>本文主要分析了从这几行 js 代码，到最终在 Native 生成 <code>UIImageView</code> 的过程。</p>
+<h2 id="jsbundle中的图片"><a href="#jsbundle中的图片" class="headerlink" title="jsbundle中的图片"></a>jsbundle中的图片</h2><p>上一篇文章讲到，无论是真机调试，还是模拟器调试，都是执行打包生成的 <code>jsbundle</code>。<code>jsbundle</code>中主要有两个东西比较值得注意：</p>
+<ol>
+<li><p><code>__d</code>：即 <code>define</code>，其定义在 <code>node_modules/metro-bundler/src/Resolver/polyfills/require.js</code> 中，可以理解为将一个模块以一个唯一的模块 ID 进行注册。</p>
+</li>
+<li><p><code>require</code>，<code>require</code>的方法参数为模块 ID，也就是 <code>__d</code> 所注册的模块 ID，其调用了在 <code>__d</code> 中注册的工厂方法。</p>
+</li>
+</ol>
+<blockquote>
+<p>有关 <code>jsbundle</code> 更加具体的解读，请参考<a href="http://zxfcumtcs.github.io/2018/05/11/RNBundle/" target="_blank" rel="external">我师父的文章^w^</a></p>
+</blockquote>
+<p>我们以 <code>source={require(&#39;../../../images_QRMedalHallRN/ranklinel.png&#39;)}</code> 指定的本地图片资源，会在 <code>jsbundle</code>中生成一段如下代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">// 代码2</div><div class="line"></div><div class="line">__d(/* QRMedalHallRN/images_QRMedalHallRN/ranklinel.png */</div><div class="line">  function(global, require, module, exports) &#123;</div><div class="line">    module.exports=require(169).registerAsset(</div><div class="line">      &#123;&quot;__packager_asset&quot;:true,</div><div class="line">      &quot;httpServerLocation&quot;:&quot;/assets/images_QRMedalHallRN&quot;,</div><div class="line">      &quot;width&quot;:27,</div><div class="line">      &quot;height&quot;:3.5,</div><div class="line">      &quot;scales&quot;:[2,3],</div><div class="line">      &quot;hash&quot;:&quot;8c3679b44d91f790bf863b7f521fd6e1&quot;,</div><div class="line">      &quot;name&quot;:&quot;ranklinel&quot;,</div><div class="line">      &quot;type&quot;:&quot;png&quot;&#125;); // 169 = react-native/Libraries/Image/AssetRegistry</div><div class="line">  &#125;,</div><div class="line">  432, </div><div class="line">  null, </div><div class="line">  &quot;QRMedalHallRN/images_QRMedalHallRN/ranklinel.png&quot;);</div></pre></td></tr></table></figure>
+<p>这里可以看到，一个本地图片资源文件，在RN中是当做一个模块来对待、处理的，有自己的 <code>__d</code> 方法。在这段代码中，<code>function</code>就是该模块所注册的工厂方法，在 <code>require</code> 该模块的时候会被调用。<code>432</code>即该模块的模块 ID。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&lt;Image source=&#123;require(&apos;../../../images_QRMedalHallRN/ranklinel.png&apos;)&#125; style=&#123;styles.medalRankLine&#125;&gt;</div><div class="line">&lt;/Image&gt;</div></pre></td></tr></table></figure>
+<p>这段代码在经过编译，打包后，在 <code>jsbundle</code> 中的存在形态如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">// 代码3</div><div class="line"></div><div class="line">_react2.default.createElement(</div><div class="line">  _reactNative.Image, </div><div class="line">  &#123; source: require(432), style: styles.medalRankLine, __source: &#123;</div><div class="line">   // 432 = ../../../images_QRMedalHallRN/ranklinel.png</div><div class="line">        fileName: _jsxFileName,</div><div class="line">        lineNumber: 130</div><div class="line">    &#125;</div><div class="line">&#125;),</div></pre></td></tr></table></figure>
+<p>可以看到，我们使用JSX写出的 <code>&lt;Image/&gt;</code> 控件，在经过编译后，变成了标准的js函数调用 <code>createElement</code> （这也是需要进行编译、打包的原因之一）。其中，调用了 <code>require(432)</code>，其实也就是去执行了上面 <code>代码2</code> 中注册的 <code>function</code>。</p>
+<p>在 <code>function</code> 中，调用了 <code>require(169)</code>，从注释可以看出，<code>169</code> 是 <code>react-native/Libraries/Image/AssetRegistry</code> 的模块 ID。也就是这里调用了 <code>AssetRegistry</code> 的 <code>registerAsset</code> 方法。</p>
+<h2 id="AssetRegistry"><a href="#AssetRegistry" class="headerlink" title="AssetRegistry"></a>AssetRegistry</h2><p><code>AssetRegistry</code> 为本地图片资源的一个注册站。它的代码很简单：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">// 代码4</div><div class="line"></div><div class="line">var assets: Array&lt;PackagerAsset&gt; = [];</div><div class="line"></div><div class="line">function registerAsset(asset: PackagerAsset): number &#123;</div><div class="line">  // `push` returns new array length, so the first asset will</div><div class="line">  // get id 1 (not 0) to make the value truthy</div><div class="line">  return assets.push(asset);</div><div class="line">&#125;</div><div class="line"></div><div class="line">function getAssetByID(assetId: number): PackagerAsset &#123;</div><div class="line">  return assets[assetId - 1];</div><div class="line">&#125;</div><div class="line"></div><div class="line">module.exports = &#123; registerAsset, getAssetByID &#125;;</div></pre></td></tr></table></figure>
+<p><code>registerAsset</code> 函数会将图片信息（一个map）保存到全局的数组中，并返回一个从1开始的索引。<code>getAssetByID</code> 函数会根据索引，取出在全局数组中保存的图片信息。注意，如果是指定本地图片的话，这里的图片信息只包含相对路径，即 <code>&#39;../../../images_QRMedalHallRN/ranklinel.png&#39;</code> 这种。</p>
+<p>因此，在 <code>&lt;Image source=...&gt;&lt;Image/&gt;</code> 中，我们以 <code>source={require()}</code> 指定的图片，会变成 <code>source=&lt;1&gt;</code> 这样的格式，而以 「uri」 指定的网络地址则不会被改变。</p>
+<h2 id="image-ios-js"><a href="#image-ios-js" class="headerlink" title="image.ios.js"></a>image.ios.js</h2><p>我们在RN中使用的 <code>&lt;Image/&gt;</code> 控件，其源码位于 <code>image.ios.js</code>：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div></pre></td><td class="code"><pre><div class="line">// 代码5，源码有删减</div><div class="line"></div><div class="line">render: function() &#123;</div><div class="line">  const source = resolveAssetSource(this.props.source) || &#123; uri: undefined, width: undefined, height: undefined &#125;;</div><div class="line"></div><div class="line">  let sources;</div><div class="line">  let style;</div><div class="line">  if (Array.isArray(source)) &#123;</div><div class="line">    style = flattenStyle([styles.base, this.props.style]) || &#123;&#125;;</div><div class="line">    sources = source;</div><div class="line">  &#125; else &#123;</div><div class="line">    const &#123;width, height, uri&#125; = source;</div><div class="line">    style = flattenStyle([&#123;width, height&#125;, styles.base, this.props.style]) || &#123;&#125;;</div><div class="line">    sources = [source];</div><div class="line"></div><div class="line">    if (uri === &apos;&apos;) &#123;</div><div class="line">      console.warn(&apos;source.uri should not be an empty string&apos;);</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  const resizeMode = this.props.resizeMode || (style || &#123;&#125;).resizeMode || &apos;cover&apos;; // Workaround for flow bug t7737108</div><div class="line">  const tintColor = (style || &#123;&#125;).tintColor; // Workaround for flow bug t7737108</div><div class="line"></div><div class="line">  if (this.props.src) &#123;</div><div class="line">    console.warn(&apos;The &lt;Image&gt; component requires a `source` property rather than `src`.&apos;);</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  return (</div><div class="line">    &lt;RCTImageView</div><div class="line">      &#123;...this.props&#125;</div><div class="line">      style=&#123;style&#125;</div><div class="line">      resizeMode=&#123;resizeMode&#125;</div><div class="line">      tintColor=&#123;tintColor&#125;</div><div class="line">      source=&#123;sources&#125;</div><div class="line">    /&gt;</div><div class="line">  );</div><div class="line">&#125;</div><div class="line"></div><div class="line">const RCTImageView = requireNativeComponent(&apos;RCTImageView&apos;, Image);</div><div class="line"></div><div class="line">module.exports = Image;</div></pre></td></tr></table></figure>
+<p>其中，第4行代码，调用了 <code>resolveAssetSource</code> 对传入的 <code>source</code> 进行了解析，并最终作为一个参数传入 <code>RCTImageView</code> 中，而 <code>RCTImageView</code> 就是 Native 端的 <code>RCTImageView</code> 类，下文会讲到。</p>
+<p>进入 <code>resolveAssetSource</code>。其定义在 <code>resolveAssetSource.js</code> 中：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">// 代码6</div><div class="line"></div><div class="line">/**</div><div class="line"> * `source` is either a number (opaque type returned by require(&apos;./foo.png&apos;))</div><div class="line"> * or an `ImageSource` like &#123; uri: &apos;&lt;http location || file path&gt;&apos; &#125;</div><div class="line"> */</div><div class="line">function resolveAssetSource(source: any): ?ResolvedAssetSource &#123;</div><div class="line">  if (typeof source === &apos;object&apos;) &#123;</div><div class="line">    return source;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  var asset = AssetRegistry.getAssetByID(source);</div><div class="line">  if (!asset) &#123;</div><div class="line">    return null;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  const resolver = new AssetSourceResolver(getDevServerURL(), getBundleSourcePath(), asset);</div><div class="line">  if (_customSourceTransformer) &#123;</div><div class="line">    return _customSourceTransformer(resolver);</div><div class="line">  &#125;</div><div class="line">  return resolver.defaultAsset();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>由注释和源码，我们很明显看出，这里传入的 <code>source</code>，要么是一个数字，即上文所述，在 <code>AssetRegistry</code> 中注册的索引，要么是以 <code>uri</code> 传入的地址，即一个字符串。如果是字符串，那么将直接返回，否则会将之前在 <code>AssetRegistry</code> 中注册的图片信息提取出来，经过 <code>AssetSourceResolver</code> 的加工，形成最终的 <code>source</code> 返回。而<code>AssetSourceResolver</code> 的初始化中，传入了三个参数，分别是「网络服务器地址」，「本地图片路径」，「图片信息」。其中，前两个参数获取方式如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div></pre></td><td class="code"><pre><div class="line">// 代码7</div><div class="line"></div><div class="line">function getDevServerURL(): ?string &#123;</div><div class="line">  if (_serverURL === undefined) &#123;</div><div class="line">    var scriptURL = NativeModules.SourceCode.scriptURL;</div><div class="line">    var match = scriptURL &amp;&amp; scriptURL.match(/^https?:\/\/.*?\//);</div><div class="line">    if (match) &#123;</div><div class="line">      // Bundle was loaded from network</div><div class="line">      _serverURL = match[0];</div><div class="line">    &#125; else &#123;</div><div class="line">      // Bundle was loaded from file</div><div class="line">      _serverURL = null;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">  return _serverURL;</div><div class="line">&#125;</div><div class="line"></div><div class="line">function getBundleSourcePath(): ?string &#123;</div><div class="line">  if (_bundleSourcePath === undefined) &#123;</div><div class="line">    const scriptURL = NativeModules.SourceCode.scriptURL;</div><div class="line">    if (!scriptURL) &#123;</div><div class="line">      // scriptURL is falsy, we have nothing to go on here</div><div class="line">      _bundleSourcePath = null;</div><div class="line">      return _bundleSourcePath;</div><div class="line">    &#125;</div><div class="line">    if (scriptURL.startsWith(&apos;assets://&apos;)) &#123;</div><div class="line">      // running from within assets, no offline path to use</div><div class="line">      _bundleSourcePath = null;</div><div class="line">      return _bundleSourcePath;</div><div class="line">    &#125;</div><div class="line">    if (scriptURL.startsWith(&apos;file://&apos;)) &#123;</div><div class="line">      // cut off the protocol</div><div class="line">      _bundleSourcePath = scriptURL.substring(7, scriptURL.lastIndexOf(&apos;/&apos;) + 1);</div><div class="line">    &#125; else &#123;</div><div class="line">      _bundleSourcePath = scriptURL.substring(0, scriptURL.lastIndexOf(&apos;/&apos;) + 1);</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  return _bundleSourcePath;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>可以看到，<code>resolveAssetSource</code> 中从 Native 端获取了 <code>scriptURL</code>，也就是 <code>jsbundle</code> 的 URL，并进行了判断：是否是网络地址，是否是本地 asset 地址，是否是沙盒文件地址等：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">// 代码8</div><div class="line"></div><div class="line">@implementation RCTSourceCode</div><div class="line"></div><div class="line">RCT_EXPORT_MODULE()</div><div class="line"></div><div class="line">@synthesize bridge = _bridge;</div><div class="line"></div><div class="line">- (NSDictionary&lt;NSString *, id&gt; *)constantsToExport</div><div class="line">&#123;</div><div class="line">  return @&#123;</div><div class="line">    @&quot;scriptURL&quot;: self.bridge.bundleURL.absoluteString ?: @&quot;&quot;</div><div class="line">  &#125;;</div><div class="line">&#125;</div><div class="line"></div><div class="line">@end</div></pre></td></tr></table></figure>
+<p>如果是从本地服务器动态进行打包，那么获取到的就是 <code>http://localhost:8081/index.ios.bundle?platform=ios&amp;dev=true&amp;minify=false</code> 这种网络地址。如果是采用了本地静态资源 bundle 的形式，那么这里获取到的是本地 asset 地址或沙盒文件路径。</p>
+<p>再看<code>AssetSourceResolver</code>。 <code>AssetSourceResolver</code>会将初始化时传入的三个参数进行整合，并加上图片分辨率等信息，返回一个包含完整图片资源路径的 JSON 格式的图片信息：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">// 代码9</div><div class="line"></div><div class="line">export type ResolvedAssetSource = &#123;</div><div class="line">  __packager_asset: boolean,</div><div class="line">  width: ?number,</div><div class="line">  height: ?number,</div><div class="line">  uri: string,</div><div class="line">  scale: number,</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>这也就是最终传入到 Native 端，用于初始化 <code>RCTImageView</code> 的 JSON 数据。至此，js 端的工作结束了。</p>
+<h2 id="Native端"><a href="#Native端" class="headerlink" title="Native端"></a>Native端</h2><p>Native 端入口，自然是 <code>RCTUIManager</code>。有关 <code>RCTUIManager</code>，在我师父的<a href="http://zxfcumtcs.github.io/2018/02/03/RNRendering/" target="_blank" rel="external">另外一篇文章^w^</a>中已经讲解的很清楚了，这里不再赘述了。</p>
+<p>我们上面生成的 JSON 数据，会被解析成 <code>RCTImageSource</code> 类的对象，这段代码在 <code>RCTImageSource</code> 中：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div></pre></td><td class="code"><pre><div class="line">// 代码10</div><div class="line"></div><div class="line">+ (RCTImageSource *)RCTImageSource:(id)json</div><div class="line">&#123;</div><div class="line">  if (!json) &#123;</div><div class="line">    return nil;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  NSURLRequest *request;</div><div class="line">  CGSize size = CGSizeZero;</div><div class="line">  CGFloat scale = 1.0;</div><div class="line">  BOOL packagerAsset = NO;</div><div class="line">  if ([json isKindOfClass:[NSDictionary class]]) &#123;</div><div class="line">    // 逻辑1</div><div class="line">    if (!(request = [self NSURLRequest:json])) &#123;</div><div class="line">      return nil;</div><div class="line">    &#125;</div><div class="line">    size = [self CGSize:json];</div><div class="line">    scale = [self CGFloat:json[@&quot;scale&quot;]] ?: [self BOOL:json[@&quot;deprecated&quot;]] ? 0.0 : 1.0;</div><div class="line">    packagerAsset = [self BOOL:json[@&quot;__packager_asset&quot;]];</div><div class="line">  &#125; else if ([json isKindOfClass:[NSString class]]) &#123;</div><div class="line">    // 逻辑2</div><div class="line">    request = [self NSURLRequest:json];</div><div class="line">  &#125; else &#123;</div><div class="line">    RCTLogConvertError(json, @&quot;an image. Did you forget to call resolveAssetSource() on the JS side?&quot;);</div><div class="line">    return nil;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  RCTImageSource *imageSource = [[RCTImageSource alloc] initWithURLRequest:request</div><div class="line">                                                                      size:size</div><div class="line">                                                                     scale:scale];</div><div class="line">  imageSource.packagerAsset = packagerAsset;</div><div class="line">  return imageSource;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><code>RCTImageSource</code> 会把图片信息进行整合，创建出一个 <code>NSURLRequest</code>。其中，逻辑1对应 <code>require()</code> 指定本地图片地址的方式，逻辑2对应 <code>uri</code> 指定网络图片地址的方式。</p>
+<p>最终，<code>RCTImageSource</code> 会传到 <code>RCTImageView</code>，<code>RCTImageView</code> 是 <code>UIImageView</code> 的子类：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div></pre></td><td class="code"><pre><div class="line">// 代码11</div><div class="line"></div><div class="line">@interface RCTImageView : UIImageView</div><div class="line"></div><div class="line">- (instancetype)initWithBridge:(RCTBridge *)bridge NS_DESIGNATED_INITIALIZER;</div><div class="line"></div><div class="line">@property (nonatomic, assign) UIEdgeInsets capInsets;</div><div class="line">@property (nonatomic, strong) UIImage *defaultImage;</div><div class="line">@property (nonatomic, assign) UIImageRenderingMode renderingMode;</div><div class="line">@property (nonatomic, copy) NSArray&lt;RCTImageSource *&gt; *imageSources;</div><div class="line">@property (nonatomic, assign) CGFloat blurRadius;</div><div class="line">@property (nonatomic, assign) RCTResizeMode resizeMode;</div><div class="line"></div><div class="line">@end</div><div class="line"></div><div class="line">@interface RCTImageView ()</div><div class="line"></div><div class="line">@property (nonatomic, copy) RCTDirectEventBlock onLoadStart;</div><div class="line">@property (nonatomic, copy) RCTDirectEventBlock onProgress;</div><div class="line">@property (nonatomic, copy) RCTDirectEventBlock onError;</div><div class="line">@property (nonatomic, copy) RCTDirectEventBlock onPartialLoad;</div><div class="line">@property (nonatomic, copy) RCTDirectEventBlock onLoad;</div><div class="line">@property (nonatomic, copy) RCTDirectEventBlock onLoadEnd;</div><div class="line"></div><div class="line">@end</div><div class="line"></div><div class="line">@implementation RCTImageView</div><div class="line">&#123;</div><div class="line">  __weak RCTBridge *_bridge;</div><div class="line"></div><div class="line">  // The image source that&apos;s currently displayed</div><div class="line">  RCTImageSource *_imageSource;</div><div class="line"></div><div class="line">  // The image source that&apos;s being loaded from the network</div><div class="line">  RCTImageSource *_pendingImageSource;</div><div class="line"></div><div class="line">  // Size of the image loaded / being loaded, so we can determine when to issue</div><div class="line">  // a reload to accomodate a changing size.</div><div class="line">  CGSize _targetSize;</div><div class="line"></div><div class="line">  /**</div><div class="line">   * A block that can be invoked to cancel the most recent call to -reloadImage,</div><div class="line">   * if any.</div><div class="line">   */</div><div class="line">  RCTImageLoaderCancellationBlock _reloadImageCancellationBlock;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>可以看到，<code>RCTImageView</code> 集中控制了图片的获取，下载（如果是网络图片的话），缓存，展示等等任务，能保证图片展示的高效性和流畅度，具体在此不再赘述了。另外，传入的是一个 <code>RCTImageSource</code> 的数组，这是为了 Native 根据不同分辨率的设备，选取合适的图片进行展示。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>说了这么多，引发这一串源码分析的，其实是一个图片资源路径错误的问题。因为我们采取了分包加载的方案，我们的 <code>common.js</code> 一开始放在了 <code>appbundle</code> 中，但我们业务的图片资源是下发后，保存在用户沙盒目录下，因此，在 <code>代码8</code> 中，返回的其实是 <code>appbundle</code> 的路径，自然取不到沙盒路径下的图片了。由此可见，弄懂源码好像才是解决问题最彻底的手段。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/ReactNative/" rel="tag"># ReactNative</a>
+          
+            <a href="/tags/iOS/" rel="tag"># iOS</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/05/01/ReactNative启动过程简析/" rel="next" title="ReactNative启动过程简析">
+                <i class="fa fa-chevron-left"></i> ReactNative启动过程简析
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      
+       <div id="gitment-container"></div>
+      
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Sheep" />
+          <p class="site-author-name" itemprop="name">Sheep</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/YangGao1991" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      Github
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/1967612625/profile?topnav=1&wvr=6&is_all=1" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                    
+                      Weibo
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#jsbundle中的图片"><span class="nav-number">1.</span> <span class="nav-text">jsbundle中的图片</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AssetRegistry"><span class="nav-number">2.</span> <span class="nav-text">AssetRegistry</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#image-ios-js"><span class="nav-number">3.</span> <span class="nav-text">image.ios.js</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Native端"><span class="nav-number">4.</span> <span class="nav-text">Native端</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Sheep</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+     
+     
+     
+     
+     <link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
+     <script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+     
+         <script type="text/javascript">
+             var gitment = new Gitment({
+                id: document.location.href, 
+                 owner: 'YangGao1991',
+                 repo: 'YangGao1991.github.io',
+                 oauth: {
+                     client_id: 'b0c19a79472eff7c9d65',
+                     client_secret: '889e377d497290f1d8341cc026e09da0cd0ac531',
+                 }});
+             gitment.render('gitment-container');
+         </script>
+     
+ 
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("GwKJDV9gM63F0OOouV9L2GVq-gzGzoHsz", "F9uWRrVJ94EkiJGaUXHGNS3s");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

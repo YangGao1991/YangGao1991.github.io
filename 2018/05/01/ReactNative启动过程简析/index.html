@@ -78,7 +78,7 @@
 <link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="iOS,ReactNative," />
+  <meta name="keywords" content="ReactNative,iOS," />
 
 
 
@@ -95,7 +95,7 @@
 
 
 <meta name="description" content="ReactNative（以下简称RN）是近年移动端非常火的技术。我们也在前段时间用RN实现了一个小的功能模块，上线效果还可以。因此，暂时对前一阶段的工作进行一下梳理和小结。这一系列将从原理、实践的角度谈谈RN，以及在实现过程中的一些经(da)验(keng)。这篇文章，主要从启动流程的角度，谈谈在启动背后，RN都做了些什么。对RN的探讨和总结都基于0.46.4版本，下同。  假定，我们已经通过re">
-<meta name="keywords" content="iOS,ReactNative">
+<meta name="keywords" content="ReactNative,iOS">
 <meta property="og:type" content="article">
 <meta property="og:title" content="ReactNative启动过程简析">
 <meta property="og:url" content="http://yoursite.com/2018/05/01/ReactNative启动过程简析/index.html">
@@ -103,7 +103,7 @@
 <meta property="og:description" content="ReactNative（以下简称RN）是近年移动端非常火的技术。我们也在前段时间用RN实现了一个小的功能模块，上线效果还可以。因此，暂时对前一阶段的工作进行一下梳理和小结。这一系列将从原理、实践的角度谈谈RN，以及在实现过程中的一些经(da)验(keng)。这篇文章，主要从启动流程的角度，谈谈在启动背后，RN都做了些什么。对RN的探讨和总结都基于0.46.4版本，下同。  假定，我们已经通过re">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://ownwf2t93.bkt.clouddn.com/react-native-xcode.png">
-<meta property="og:updated_time" content="2018-05-01T09:05:49.823Z">
+<meta property="og:updated_time" content="2018-06-03T12:06:59.786Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ReactNative启动过程简析">
 <meta name="twitter:description" content="ReactNative（以下简称RN）是近年移动端非常火的技术。我们也在前段时间用RN实现了一个小的功能模块，上线效果还可以。因此，暂时对前一阶段的工作进行一下梳理和小结。这一系列将从原理、实践的角度谈谈RN，以及在实现过程中的一些经(da)验(keng)。这篇文章，主要从启动流程的角度，谈谈在启动背后，RN都做了些什么。对RN的探讨和总结都基于0.46.4版本，下同。  假定，我们已经通过re">
@@ -365,7 +365,7 @@
                   <span class="post-meta-item-text">字数统计</span>
                 
                 <span title="字数统计">
-                  1,892
+                  2,081
                 </span>
               
 
@@ -432,8 +432,17 @@
 <p>关于<code>RCTBridge</code>具体的初始化细节，以及Native与JS通信的原理和过程，请参考<a href="http://zxfcumtcs.github.io/2017/10/08/ReactNativeCommunicationMechanism/" target="_blank" rel="external">我师父的文章^w^</a></p>
 <p><code>RCTRootView</code>在接收到<code>RCTJavaScriptDidLoadNotification</code>通知后，会创建一个<code>RCTRootContentView</code>，用于页面的实际展示。然后，会调用<code>runApplication</code>方法：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">- (void)runApplication:(RCTBridge *)bridge</div><div class="line">&#123;</div><div class="line">  NSString *moduleName = _moduleName ?: @&quot;&quot;;</div><div class="line">  NSDictionary *appParameters = @&#123;</div><div class="line">    @&quot;rootTag&quot;: _contentView.reactTag,</div><div class="line">    @&quot;initialProps&quot;: _appProperties ?: @&#123;&#125;,</div><div class="line">  &#125;;</div><div class="line"></div><div class="line">  RCTLogInfo(@&quot;Running application %@ (%@)&quot;, moduleName, appParameters);</div><div class="line">  [bridge enqueueJSCall:@&quot;AppRegistry&quot;</div><div class="line">                 method:@&quot;runApplication&quot;</div><div class="line">                   args:@[moduleName, appParameters]</div><div class="line">             completion:NULL];</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 <p>该方法调用了js端，<code>AppRegistry.js</code>的<code>runApplication</code>方法，并将<code>moduleName</code>，<code>initialProps</code>等参数传到js端。其中，<code>moduleName</code>就是在业务入口文件<code>index.ios.js</code>中注册的业务名称：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">AppRegistry.registerComponent(&apos;QRMedalHallRN&apos;, () =&gt; QRMedalHallRN);</div></pre></td></tr></table></figure></p>
+<p>w</p>
 <h2 id="Stage-4-完成！"><a href="#Stage-4-完成！" class="headerlink" title="Stage 4. 完成！"></a>Stage 4. 完成！</h2><p>控制权交给js端。<code>AppRegistry.js</code>中保存了一份所有通过<code>AppRegistry.registerComponent()</code>注册的业务的映射表<code>runnables</code>，其key为<code>appKey</code>，也就是上面说的<code>moduleName</code>。每个key对应一个<code>run()</code>函数。</p>
-<p>在收到Native端传过来的<code>moduleName</code>，<code>initialProps</code>参数后，会从<code>runnables</code>中找到该注册过的业务，执行相应的<code>run()</code>函数。<code>run()</code>函数中最终调用了<code>ReactNative.render()</code>函数。接着，RN会根据配置，决定是采用新的React引擎<code>Fiber</code>，还是老的<code>Stack</code>来进行渲染。至此，初始化工作完成。</p>
+<p>在收到Native端传过来的<code>moduleName</code>，<code>initialProps</code>参数后，会从<code>runnables</code>中找到该注册过的业务，执行相应的<code>run()</code>函数。<code>run()</code>函数中最终调用了<code>ReactNative.render()</code>函数。接着，RN会根据配置，决定是采用新的React引擎<code>Fiber</code>，还是老的<code>Stack</code>来进行渲染。目前，还是使用老的<code>Stack</code>进行渲染，React 16中使用<code>Fiber</code>。</p>
+<p>在<code>ReactNativeStack-dev</code>中，我们可以看到，最终调用到了<code>mountComponent</code>函数来进行渲染：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">mountComponent: function(transaction, hostParent, hostContainerInfo, context) &#123;</div><div class="line">    var tag = ReactNativeTagHandles_1.allocateTag();</div><div class="line">    this._rootNodeID = tag, this._hostParent = hostParent, this._hostContainerInfo = hostContainerInfo;</div><div class="line">    for (var key in this.viewConfig.validAttributes) this._currentElement.props.hasOwnProperty(key) &amp;&amp; deepFreezeAndThrowOnMutationInDev(this._currentElement.props[key]);</div><div class="line">    var updatePayload = ReactNativeAttributePayload_1.create(this._currentElement.props, this.viewConfig.validAttributes), nativeTopRootTag = hostContainerInfo._tag;</div><div class="line">    return UIManager.createView(tag, this.viewConfig.uiViewClassName, nativeTopRootTag, updatePayload),</div><div class="line">    ReactNativeComponentTree_1.precacheNode(this, tag), this.initializeChildren(this._currentElement.props.children, tag, transaction, context),</div><div class="line">    tag;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>可以看到，这里将代码控制权又交给了 Native 侧的 <code>UIManager</code> ，调用了 <code>createView</code> 方法，在 Native 侧进行页面、视图的创建等。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">RCT_EXPORT_METHOD(createView:(nonnull NSNumber *)reactTag</div><div class="line">                  viewName:(NSString *)viewName</div><div class="line">                  rootTag:(__unused NSNumber *)rootTag</div><div class="line">                  props:(NSDictionary *)props)</div></pre></td></tr></table></figure>
+<blockquote>
+<p><code>UIManager</code> 的 <code>createView</code> 方法也是 js 调用 Native 创建视图的入口。</p>
+</blockquote>
+<p>至此，初始化工作完成。</p>
 <h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>这篇文章归纳整理了一下RN初始化流程。虽然这些流程大部分都被封装成了几个简单的接口，但了解这一流程的原理还是有好处的，比如说，在分工程调试（一个主工程，一个RN单独的工程）的时候，可以修改一些参数，使得主工程可以直接读取到RN工程中的业务js代码。</p>
 <p>刚刚接触RN（前端）的知识，如果有说的不对的地方还请指教。^^</p>
 <hr>
@@ -456,9 +465,9 @@
       
         <div class="post-tags">
           
-            <a href="/tags/iOS/" rel="tag"># iOS</a>
-          
             <a href="/tags/ReactNative/" rel="tag"># ReactNative</a>
+          
+            <a href="/tags/iOS/" rel="tag"># iOS</a>
           
         </div>
       
@@ -480,6 +489,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/06/03/ReactNative图片解析及渲染流程/" rel="prev" title="ReactNative图片解析及渲染流程">
+                ReactNative图片解析及渲染流程 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -560,7 +573,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-count">7</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
