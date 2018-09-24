@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="iOS,SwiftGG,Runtime," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="这一系列将会转载我在 SwiftGG 翻译组的工作，以作统一归档。 SwiftGG原文链接：http://swift.gg/2018/06/11/friday-qa-2015-05-29-concurrent-memory-deallocation-in-the-objective-c-runtime/  Objective-C Runtime是绝大多数Mac和iOS程序代码的核心。Runtim">
+<meta name="keywords" content="iOS,SwiftGG,Runtime">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【转】Objective-C Runtime中内存释放的并发问题">
+<meta property="og:url" content="http://yoursite.com/2018/09/24/Concurrent Memory Deallocation in the Objective-C Runtime/index.html">
+<meta property="og:site_name" content="Sheep&#39;s Blog">
+<meta property="og:description" content="这一系列将会转载我在 SwiftGG 翻译组的工作，以作统一归档。 SwiftGG原文链接：http://swift.gg/2018/06/11/friday-qa-2015-05-29-concurrent-memory-deallocation-in-the-objective-c-runtime/  Objective-C Runtime是绝大多数Mac和iOS程序代码的核心。Runtim">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-09-24T07:10:53.985Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="【转】Objective-C Runtime中内存释放的并发问题">
+<meta name="twitter:description" content="这一系列将会转载我在 SwiftGG 翻译组的工作，以作统一归档。 SwiftGG原文链接：http://swift.gg/2018/06/11/friday-qa-2015-05-29-concurrent-memory-deallocation-in-the-objective-c-runtime/  Objective-C Runtime是绝大多数Mac和iOS程序代码的核心。Runtim">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"hide","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/09/24/Concurrent Memory Deallocation in the Objective-C Runtime/"/>
+
+
+
+
+
+  <title>【转】Objective-C Runtime中内存释放的并发问题 | Sheep's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Sheep's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Try...Catch!</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/24/Concurrent Memory Deallocation in the Objective-C Runtime/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Sheep">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Sheep's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">【转】Objective-C Runtime中内存释放的并发问题</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-09-24T14:28:26+08:00">
+                2018-09-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS开发/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS开发</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2018/09/24/Concurrent Memory Deallocation in the Objective-C Runtime/" class="leancloud_visitors" data-flag-title="【转】Objective-C Runtime中内存释放的并发问题">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                  <span class="post-meta-divider">|</span>
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计</span>
+                
+                <span title="字数统计">
+                  3,923
+                </span>
+              
+
+              
+
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>这一系列将会转载我在 SwiftGG 翻译组的工作，以作统一归档。</p>
+<p>SwiftGG原文链接：<a href="http://swift.gg/2018/06/11/friday-qa-2015-05-29-concurrent-memory-deallocation-in-the-objective-c-runtime/" target="_blank" rel="external">http://swift.gg/2018/06/11/friday-qa-2015-05-29-concurrent-memory-deallocation-in-the-objective-c-runtime/</a></p>
+</blockquote>
+<p>Objective-C Runtime是绝大多数Mac和iOS程序代码的核心。Runtime的核心就是<code>objc_msgSend</code>函数，而这个函数最关键的就是方法缓存了。我在这篇文章中将会阐述一下，Apple是如何在不影响性能的情况下，以线程安全的方式来重新分配缓存大小、释放方法缓存的。</p>
+<h3 id="消息传递的概念"><a href="#消息传递的概念" class="headerlink" title="消息传递的概念"></a>消息传递的概念</h3><p><code>objc_msgSend</code>会查找被调用的方法的实现，然后去执行。从概念上讲，查找方法的过程如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">IMP lookUp(id obj, SEL selector) &#123;</div><div class="line">    Class c = object_getClass(obj);</div><div class="line"></div><div class="line">    while(c) &#123;</div><div class="line">        for(int i = 0; i &lt; c-&gt;numMethods; i++) &#123;</div><div class="line">            Method m = c-&gt;methods[i];</div><div class="line">            if(m.selector == selector) &#123;</div><div class="line">                return m.imp;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        c = c-&gt;superclass;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    return _objc_msgForward;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>考虑到源码的版权，一些变量名做了修改。如果你想看看真实的实现代码，可以查看Objective-C runtime的开源代码：</p>
+<p><a href="http://www.opensource.apple.com/source/objc4/" target="_blank" rel="external">http://www.opensource.apple.com/source/objc4/</a></p>
+<h3 id="方法缓存"><a href="#方法缓存" class="headerlink" title="方法缓存"></a>方法缓存</h3><p>绝大部分Objective-C的代码到处充满了消息传递。如果每一次消息传递都需要进行一次查找的话，速度将会非常慢。</p>
+<p>解决方法是建立方法的缓存。每个类持有一个哈希表，将方法名映射到方法的实现。这个哈希表需要尽可能地提高读取效率，<code>objc_msgSend</code>函数使用精心构造的汇编代码来快速实现这个哈希表的查询。这样，在有缓存的情况下，一条消息的传递只需要几纳秒的时间。虽然每条消息第一次被传递的时候还是很慢，但这之后，就会变得很快。</p>
+<p>我们所说的“缓存”，通常来说是指为了加快多次访问最近使用过的资源的速度，而开辟的一块有限大小的区域。例如，你可能会把从Internet上下载的图片缓存起来，那么接下来的一段时间，如果再需要使用到这些图片的话，就不需要再去从网络下载了。尽管如此，你也不会希望缓存占用太多的内存空间。所以你可能会限制缓存图片的最大数量。当缓存的图片达到最大数量后，每次缓存新的图片，就会把最旧的那个从缓存中去掉。</p>
+<p>这对于大部分问题来说是一个不错的做法，但它也可能导致性能上的损耗。比如，你设定图片缓存最多缓存40张图片，但在某种情况下，你的应用需要一直循环使用41张图片，这时你会发现，你的缓存突然变得毫无作用了！</p>
+<p>对于我们自己的app，我们当然可以经过测试，调节缓存的大小来避免出现这样的情况，但Objective-C的runtime并不能这样做。方法缓存对性能是如此重要，并且，每个方法的缓存占用的空间都很小，因此，runtime并不会对缓存空间的大小进行限制，而是会在需要时随时扩大缓存空间，来缓存所有发送过的消息。</p>
+<p>请注意，runtime的方法缓存有时确实是会刷新的。比如当将新的代码加载到进程时，或者修改了一个类的方法列表时，可能会导致某些缓存的数据失效。这时，相应的旧的缓存数据就会被删除，并重新写入新的缓存数据。</p>
+<h3 id="改变缓存大小，销毁，以及线程问题"><a href="#改变缓存大小，销毁，以及线程问题" class="headerlink" title="改变缓存大小，销毁，以及线程问题"></a>改变缓存大小，销毁，以及线程问题</h3><p>改变缓存大小，从概念上来说是很简单的，比如这样：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">bucket_t *newCache = malloc(newSize);</div><div class="line">copyEntries(newCache, class-&gt;cache);</div><div class="line">free(class-&gt;cache);</div><div class="line">class-&gt;cache = newCache;</div></pre></td></tr></table></figure></p>
+<p>实际上，Objective-C runtime确实在这代码上又进行了精简：甚至并没有将旧的缓存数据复制到新的缓存空间中！毕竟，这只是一块缓存空间而已，并没有要求一定要保留其中的数据。在消息发送的时候，新的数据自然又会被缓存下来。因此，事实上，代码会像这样：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">free(class-&gt;cache);</div><div class="line">class-&gt;cache = malloc(newSize);</div></pre></td></tr></table></figure></p>
+<p>在单线程环境中，需要做的就是这么多了，这篇文章也会很短。但，Objective-C runtime当然必须支持多线程操作，这就意味着这里所有的代码必须是线程安全的。每一个类的缓存数据都可能会被多个线程同时操作，因此，这里的代码必须谨慎处理，才能满足线程安全的条件。</p>
+<p>像上面的写法自然不行。在释放了旧的缓存空间，并且还没有正确赋值新开辟的空间的这段“窗口时间”中，另一个线程就可能访问到非法的地址。这会导致其访问到垃圾数据，或者，如果那块内存没有进行映射的话，造成闪退。</p>
+<p>我们可以怎样解决这个问题呢？典型的做法是使用线程锁，就像这样：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">lock(class-&gt;lock);</div><div class="line">free(class-&gt;cache);</div><div class="line">class-&gt;cache = malloc(newSize);</div><div class="line">unlock(class-&gt;lock);</div></pre></td></tr></table></figure></p>
+<p>所有访问都必须由锁控制，包括读操作。这样就意味着，<code>objc_msgSend</code>方法可能需要获取线程锁，访问缓存空间，然后释放锁。考虑到缓存的查找本身只会占用几纳秒的时间，每次获取、释放锁会增加很多时间的损耗，对性能的影响太大了。</p>
+<p>我们也可以尝试用另外的方法去解决“窗口时间”。例如，如果我们先分配和赋值新的内存控件，再销毁旧的呢？<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">bucket_t *oldCache = class-&gt;cache;</div><div class="line">class-&gt;cache = malloc(newSize);</div><div class="line">free(oldCache);</div></pre></td></tr></table></figure></p>
+<p>这也许有点用，但并没有解决问题。另一个线程也可能先获取到旧缓存的指针，然后在访问内存前被系统中断。然后，旧的缓存被销毁后，另外的线程又重新启动，这就导致了和前面一样的问题。</p>
+<p>如果我们加一个延迟呢？比如说：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">bucket_t *oldCache = class-&gt;cache;</div><div class="line">class-&gt;cache = malloc(newSize);</div><div class="line">after(5 /* seconds */, ^&#123;</div><div class="line">    free(oldCache);</div><div class="line">&#125;);</div></pre></td></tr></table></figure></p>
+<p>这几乎是可行的，但还是可以想到一种情况，就是一个线程刚好被中断足够久，以至于五秒的延迟结束了才重新启动。虽然这样的情况及其罕见，但并不是毫无可能。</p>
+<p>如果不是设置一个固定的延迟时间，而是确定等到“窗口时间”结束呢。我们可以给<code>objc_msgSend</code>函数增加一个计数器，就像这样：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">gInMsgSend++;</div><div class="line">lookUpCache(class-&gt;cache);</div><div class="line">gInMsgSend--;</div></pre></td></tr></table></figure></p>
+<p>正确的线程安全的做法需要对计数器使用原子性，以及使用内存屏障，来保证互相依赖的缓存的读取/存储正确进行。在本文中，假定已经这样做了。</p>
+<p>有了计数器，重新分配缓存的代码就会像这样：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">bucket_t *oldCache = class-&gt;cache;</div><div class="line">class-&gt;cache = malloc(newSize);</div><div class="line">while(gInMsgSend)</div><div class="line">    ; // spin</div><div class="line">free(oldCache);</div></pre></td></tr></table></figure></p>
+<p>注意到我们并不需要阻塞<code>objc_msgSend</code>的执行，就能让这段代码正确工作。在给缓存的指针重新赋值后，一旦某一时刻，确认没有方法在调用<code>objc_msgSend</code>了，就可以将旧的缓存空间释放。另一个线程有可能会在旧缓存空间被释放的时候调用<code>objc_msgSend</code>，但这次新的调用不再会访问到旧的缓存的指针了，因此是安全的。</p>
+<p>然而，轮询操作效率较低，且不优雅。事实上，释放旧的缓存空间并不是十分要紧的一件事。内存能够正确释放当然是好的，但如果过会儿再释放也没有什么大不了。因此，我们可以不使用轮询，而是持有一份未释放的缓存的记录表。每次需要释放缓存时，就清空所有待释放的缓存：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">bucket_t *oldCache = class-&gt;cache;</div><div class="line">class-&gt;cache = malloc(newSize);</div><div class="line"></div><div class="line">append(gOldCachesList, oldCache);</div><div class="line">if(!gInMsgSend) &#123;</div><div class="line">    for(cache in gOldCachesList) &#123;</div><div class="line">        free(cache);</div><div class="line">    &#125;</div><div class="line">    gOldCachesList.clear();</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>如果一条消息正在传递的话，那这里并不会立刻清空旧的缓存。但没关系，当下次时机来临的时候，或许是消息传递结束了，或许是未来的某个时间点，这些过期的缓存都会被清空的。</p>
+<p>这个版本已经很接近Objective-C runtime的源码版本了。</p>
+<h3 id="零消耗的标志位"><a href="#零消耗的标志位" class="headerlink" title="零消耗的标志位"></a>零消耗的标志位</h3><p>消息传递中的两部分存在着明显的不同。<code>objc_msgSend</code>可能每秒钟需要运行数百万次，因此速度必须足够快，最好单次调用只消耗几纳秒的时间。然而，重新分配缓存却是个比较不频繁的操作，而且随着app持续的运行，该操作也会变得越来越少。一旦app达到一个稳定的状态，不再加载新的代码，不再修改消息列表，这时缓存也就达到了它们所需的最大容量，再也不需要重新分配缓存了。在这之前，可能会发生成百上千次的缓存的重新分配，但相比于<code>objc_msgSend</code>来说，调用是十分少的，因此对性能的要求也很低。</p>
+<p>因此，应当尽可能少的去干预消息传递的过程，尽管这样会让缓存释放的过程变慢。如果在<code>objc_msgSend</code>阶段能减少一个CPU周期，那么即使每次缓存释放操作都会消耗一百万个CPU周期，那也能极大提高效率。</p>
+<p>因此，哪怕设置一个全局的计数器也显得太损耗性能了。那意味着<code>objc_msgSend</code>过程中需要增加两次内存访问，从而增加很多性能开销。而需要使用原子性以及内存屏障只会让这变得更糟。幸运的是，Objective-C runtime能够将<code>objc_msgSend</code>的性能损耗降至0，代价是会让缓存释放的过程变得慢很多。</p>
+<p>在上面的代码中，我们设置的全局计数器的目的是为了追踪是否有线程处于消息传递的过程中。事实上，线程本身已经可以追踪自身正在运行什么代码了：程序计数器。这是一个记录当前指令的内存地址的CPU寄存器。我们可以用它来代替全局的计数器，来检查每个线程是否处于<code>objc_msgSend</code>当中。如果所有线程都不处于<code>objc_msgSend</code>中，那么旧的缓存就可以被安全释放。这种方法的实现如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">BOOL ThreadsInMsgSend(void) &#123;</div><div class="line">       for(thread in GetAllThreads()) &#123;</div><div class="line">           uintptr_t pc = thread.GetPC();</div><div class="line">           if(pc &gt;= objc_msgSend_startAddress &amp;&amp; pc &lt;= objc_msgSend_endAddress) &#123;</div><div class="line">               return YES;</div><div class="line">           &#125;</div><div class="line">       &#125;</div><div class="line">       return NO;</div><div class="line">   &#125;</div><div class="line"></div><div class="line">   bucket_t *oldCache = class-&gt;cache;</div><div class="line">   class-&gt;cache = malloc(newSize);</div><div class="line"></div><div class="line">   append(gOldCachesList, oldCache);</div><div class="line">   if(!ThreadsInMsgSend()) &#123;</div><div class="line">       for(cache in gOldCachesList) &#123;</div><div class="line">           free(cache);</div><div class="line">       &#125;</div><div class="line">       gOldCachesList.clear();</div><div class="line">   &#125;</div></pre></td></tr></table></figure></p>
+<p><code>objc_msgSend</code>并不需要做任何额外的事情，它可以不用考虑设置标志位，直接访问缓存：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">lookUpCache(class-&gt;cache);</div></pre></td></tr></table></figure></p>
+<p>缓存释放的代码效率很低，因为它需要检查进程中所有线程的状态。但这样<code>objc_msgSend</code>却可以达到与单线程环境中同样高的效率，这是一个值得的代价。这就是Apple的runtime源码最终工作的方式。</p>
+<h3 id="真实代码"><a href="#真实代码" class="headerlink" title="真实代码"></a>真实代码</h3><p>关于以上的实现，可以查看runtime源码中<a href="https://opensource.apple.com/source/objc4/objc4-646/runtime/objc-cache.mm" target="_blank" rel="external">objc-cache.mm</a>中的<code>_collecting_in_critical</code>函数。</p>
+<p>需要使用程序计数器的入口和出口位置被储存在全局变量中：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">OBJC_EXPORT uintptr_t objc_entryPoints[];</div><div class="line">OBJC_EXPORT uintptr_t objc_exitPoints[];</div></pre></td></tr></table></figure></p>
+<p>事实上，<code>objc_msgSend</code>有多种实现方式（比如说，在struct返回的时候？），内部的<code>cache_getImp</code>也是直接访问缓存。这些都需要在缓存释放的时候被检查。</p>
+<p><code>_collecting_in_critical</code>函数没有入参，返回一个<code>int</code>类型，被当做一个布尔类型的标志位，指明是否有线程处于关键的函数中：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">static int _collecting_in_critical(void)</div><div class="line">&#123;</div></pre></td></tr></table></figure></p>
+<p>我会跳过该函数中不感兴趣的部分，关注最关键的步骤。如果你想看到全部的实现，可以查看<a href="https://opensource.apple.com/source/objc4/objc4-646/runtime/objc-cache.mm" target="_blank" rel="external">opensource.apple.com</a>。</p>
+<p>获取线程信息的API处于mach级。<code>task_threads</code>能够获取到给定任务（进程在mach中的表示）中所有的线程，这里用它来获取当前进程中的线程：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ret = task_threads(mach_task_self(), &amp;threads, &amp;number);</div></pre></td></tr></table></figure></p>
+<p>函数会在<code>threads</code>中保存<code>thread_t</code>的数组，在<code>number</code>中保存线程的数量。然后会遍历所有线程：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">for (count = 0; count &lt; number; count++)</div><div class="line">&#123;</div></pre></td></tr></table></figure></p>
+<p>获取一个线程的程序计数器是在另外一个单独的函数中：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">pc = _get_pc_for_thread (threads[count]);</div></pre></td></tr></table></figure></p>
+<p>然后，程序会遍历所有的入口和出口，并逐个进行判断：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">    for (region = 0; objc_entryPoints[region] != 0; region++)</div><div class="line">    &#123;</div><div class="line">        if ((pc &gt;= objc_entryPoints[region]) &amp;&amp;</div><div class="line">            (pc &lt;= objc_exitPoints[region])) </div><div class="line">        &#123;</div><div class="line">            result = TRUE;</div><div class="line">            goto done;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>遍历结束后，将结果返回给调用者：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">    return result;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p><code>_get_pc_for_thread</code>函数是怎么工作的呢？它只是简单调用了<code>thread_get_state</code>函数来获得了目标线程的寄存器状态。之所以要放到一个单独的函数中，是因为寄存器状态的结构体是与具体架构相关的，不同架构都有不同的寄存器。也就是说，这个函数需要对每个支持的架构有一套单独的实现，尽管这些实现几乎相同。下面是x86-64下的实现：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">static uintptr_t _get_pc_for_thread(thread_t thread)</div><div class="line">&#123;</div><div class="line">    x86_thread_state64_t            state;</div><div class="line">    unsigned int count = x86_THREAD_STATE64_COUNT;</div><div class="line">    kern_return_t okay = thread_get_state (thread, x86_THREAD_STATE64, (thread_state_t)&amp;state, &amp;count);</div><div class="line">    return (okay == KERN_SUCCESS) ? state.__rip : PC_SENTINEL;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>rip是x86-64下，程序计数器的寄存器名字。“R”代表“register”，“IP”代表“instruction pointer”。</p>
+<p>上面所说的入口和出口的代码位置，与其函数一同定义在汇编文件中：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">.private_extern _objc_entryPoints</div><div class="line">_objc_entryPoints:</div><div class="line">    .quad   _cache_getImp</div><div class="line">    .quad   _objc_msgSend</div><div class="line">    .quad   _objc_msgSend_fpret</div><div class="line">    .quad   _objc_msgSend_fp2ret</div><div class="line">    .quad   _objc_msgSend_stret</div><div class="line">    .quad   _objc_msgSendSuper</div><div class="line">    .quad   _objc_msgSendSuper_stret</div><div class="line">    .quad   _objc_msgSendSuper2</div><div class="line">    .quad   _objc_msgSendSuper2_stret</div><div class="line">    .quad   0</div><div class="line"></div><div class="line">.private_extern _objc_exitPoints</div><div class="line">_objc_exitPoints:</div><div class="line">    .quad   LExit_cache_getImp</div><div class="line">    .quad   LExit_objc_msgSend</div><div class="line">    .quad   LExit_objc_msgSend_fpret</div><div class="line">    .quad   LExit_objc_msgSend_fp2ret</div><div class="line">    .quad   LExit_objc_msgSend_stret</div><div class="line">    .quad   LExit_objc_msgSendSuper</div><div class="line">    .quad   LExit_objc_msgSendSuper_stret</div><div class="line">    .quad   LExit_objc_msgSendSuper2</div><div class="line">    .quad   LExit_objc_msgSendSuper2_stret</div><div class="line">    .quad   0</div></pre></td></tr></table></figure></p>
+<p><code>_collecting_in_critical</code>的用法和上面我们假设的例子很相似。它在释放缓存之前被调用。事实上，runtime有两种工作模式：一种是如果其他线程正在调用相关函数的话，就把垃圾内存的清理工作留到下一次调用；一种是一直轮询，直到确认没有线程正在调用，然后再进行销毁：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">// Synchronize collection with objc_msgSend and other cache readers</div><div class="line">if (!collectALot) &#123;</div><div class="line">    if (_collecting_in_critical ()) &#123;</div><div class="line">        // objc_msgSend (or other cache reader) is currently looking in</div><div class="line">        // the cache and might still be using some garbage.</div><div class="line">        if (PrintCaches) &#123;</div><div class="line">            _objc_inform (&quot;CACHES: not collecting; &quot;</div><div class="line">                          &quot;objc_msgSend in progress&quot;);</div><div class="line">        &#125;</div><div class="line">        return;</div><div class="line">    &#125;</div><div class="line">&#125; </div><div class="line">else &#123;</div><div class="line">    // No excuses.</div><div class="line">    while (_collecting_in_critical()) </div><div class="line">        ;</div><div class="line">&#125;</div><div class="line"></div><div class="line">// free garbage here</div></pre></td></tr></table></figure></p>
+<p>第一种将垃圾内存留到下一次调用时清理的模式，是在正常的重新分配缓存大小时采用；第二种始终清理垃圾内存的模式，是在需要刷新所有类的所有缓存时使用，因为这样往往会产生大量的垃圾内存。以我阅读代码来看，这种情况只会在开启一项日志调试功能时发生。日志调试会将所有的消息发送记录到文件中，消息缓存会影响这一日志，因此需要全部刷新。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>性能和线程安全经常会互相冲突。不同部分的代码对同一块内存的访问方式往往不同，也就允许我们以更加有效率的方式来实现线程安全。方式之一是用一个全局标志位或者计数器来指明对内存的改动操作是否安全。在Objective-C runtime中，Apple更进一步，使用了各个线程的程序计数器来判断线程是否正在进行不安全的操作。这是一个很专业的案例，这种做法想要用到其他地方也不是很有用，但研究它的原理本身就是一件很有意思的事情。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/iOS/" rel="tag"># iOS</a>
+          
+            <a href="/tags/SwiftGG/" rel="tag"># SwiftGG</a>
+          
+            <a href="/tags/Runtime/" rel="tag"># Runtime</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/06/03/ReactNative图片解析及渲染流程/" rel="next" title="ReactNative图片解析及渲染流程">
+                <i class="fa fa-chevron-left"></i> ReactNative图片解析及渲染流程
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      
+       <div id="gitment-container"></div>
+      
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Sheep" />
+          <p class="site-author-name" itemprop="name">Sheep</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/YangGao1991" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      Github
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/1967612625/profile?topnav=1&wvr=6&is_all=1" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                    
+                      Weibo
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#消息传递的概念"><span class="nav-number">1.</span> <span class="nav-text">消息传递的概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#方法缓存"><span class="nav-number">2.</span> <span class="nav-text">方法缓存</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#改变缓存大小，销毁，以及线程问题"><span class="nav-number">3.</span> <span class="nav-text">改变缓存大小，销毁，以及线程问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#零消耗的标志位"><span class="nav-number">4.</span> <span class="nav-text">零消耗的标志位</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#真实代码"><span class="nav-number">5.</span> <span class="nav-text">真实代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">6.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Sheep</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+     
+     
+     
+     
+     <link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
+     <script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+     
+         <script type="text/javascript">
+             var gitment = new Gitment({
+                id: document.location.href, 
+                 owner: 'YangGao1991',
+                 repo: 'YangGao1991.github.io',
+                 oauth: {
+                     client_id: 'b0c19a79472eff7c9d65',
+                     client_secret: '889e377d497290f1d8341cc026e09da0cd0ac531',
+                 }});
+             gitment.render('gitment-container');
+         </script>
+     
+ 
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("GwKJDV9gM63F0OOouV9L2GVq-gzGzoHsz", "F9uWRrVJ94EkiJGaUXHGNS3s");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
